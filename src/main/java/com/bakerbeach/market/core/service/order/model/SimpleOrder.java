@@ -23,6 +23,7 @@ public class SimpleOrder extends HashMap<String, Object> implements Order {
 	private static final String CREATED_AT = "created_at";
 	private static final String UPDATED_AT = "updated_at";
 	private static final String PAYMENT_CODE = "payment_code";
+	private static final String PAYMENT_TRANSACTION_ID = "payment_transaction_id";
 	private static final String ADDITIONAL_INFORMATIONS = "additional_informations";
 	private Address shippingAddress;
 	private Address billingAddress;
@@ -76,7 +77,7 @@ public class SimpleOrder extends HashMap<String, Object> implements Order {
 	public void setCustomerId(String customerId) {
 		put(CUSTOMER_ID, customerId);
 	}
-	
+
 	@Override
 	public String getCustomerEmail() {
 		return (String) get(CUSTOMER_EMAIL);
@@ -85,17 +86,15 @@ public class SimpleOrder extends HashMap<String, Object> implements Order {
 	public void setCustomerEmail(String customerEmail) {
 		put(CUSTOMER_EMAIL, customerEmail);
 	}
-	
+
 	@Override
 	public String getOrderStatus() {
 		return (String) get(STATUS);
 	}
-	
+
 	public void setStatus(String status) {
 		put(STATUS, status);
 	}
-
-
 
 	@Override
 	public HashMap<String, Object> getAttributes() {
@@ -110,7 +109,8 @@ public class SimpleOrder extends HashMap<String, Object> implements Order {
 	}
 
 	/**
-	 * @param shippingAddress the shippingAddress to set
+	 * @param shippingAddress
+	 *            the shippingAddress to set
 	 */
 	public void setShippingAddress(Address shippingAddress) {
 		this.shippingAddress = shippingAddress;
@@ -124,7 +124,8 @@ public class SimpleOrder extends HashMap<String, Object> implements Order {
 	}
 
 	/**
-	 * @param billingAddress the billingAddress to set
+	 * @param billingAddress
+	 *            the billingAddress to set
 	 */
 	public void setBillingAddress(Address billingAddress) {
 		this.billingAddress = billingAddress;
@@ -138,7 +139,8 @@ public class SimpleOrder extends HashMap<String, Object> implements Order {
 	}
 
 	/**
-	 * @param items the items to set
+	 * @param items
+	 *            the items to set
 	 */
 	public void setItems(List<OrderItem> items) {
 		this.items = items;
@@ -149,38 +151,46 @@ public class SimpleOrder extends HashMap<String, Object> implements Order {
 	public HashMap<String, Object> getAdditionalInformations() {
 		return (HashMap<String, Object>) get(ADDITIONAL_INFORMATIONS);
 	}
-	
-	public void setAdditionalInformations(HashMap<String, Object> additionalInformations){
+
+	public void setAdditionalInformations(HashMap<String, Object> additionalInformations) {
 		put(ADDITIONAL_INFORMATIONS, additionalInformations);
 	}
 
 	@Override
 	public Date getUpdatedAt() {
-		return (Date)get(UPDATED_AT);
+		return (Date) get(UPDATED_AT);
 	}
 
 	@Override
 	public Date getCreatedAt() {
-		return (Date)get(CREATED_AT);
+		return (Date) get(CREATED_AT);
 	}
 
 	@Override
 	public void setUpdatedAt(Date date) {
 		put(UPDATED_AT, date);
 	}
-	
+
 	public void setCreatedAt(Date date) {
 		put(CREATED_AT, date);
 	}
 
 	@Override
 	public String getPaymentCode() {
-		return (String)get(PAYMENT_CODE);
-	}
-	
-	public void setPaymentCode(String paymentCode) {
-		put(PAYMENT_CODE,paymentCode);
+		return (String) get(PAYMENT_CODE);
 	}
 
+	public void setPaymentCode(String paymentCode) {
+		put(PAYMENT_CODE, paymentCode);
+	}
+
+	@Override
+	public String getPaymentTransactionId() {
+		return (String) get(PAYMENT_TRANSACTION_ID);
+	}
+
+	public void setPaymentTransactionId(String paymentTransactionId) {
+		put(PAYMENT_TRANSACTION_ID, paymentTransactionId);
+	}
 
 }

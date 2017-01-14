@@ -38,6 +38,7 @@ import com.bakerbeach.market.inventory.api.service.InventoryServiceException;
 import com.bakerbeach.market.order.api.model.OrderList;
 import com.bakerbeach.market.order.api.service.OrderService;
 import com.bakerbeach.market.order.api.service.OrderServiceException;
+import com.bakerbeach.market.payment.api.model.PaymentInfo;
 import com.bakerbeach.market.payment.api.service.PaymentService;
 import com.bakerbeach.market.payment.api.service.PaymentServiceException;
 import com.bakerbeach.market.sequence.service.SequenceService;
@@ -88,7 +89,8 @@ public class OrderServiceImpl implements OrderService {
 					coupon.getCode();
 				} catch (CartServiceException cse) {
 					cart.getCoupons().clear();
-					throw new OrderServiceException(cse.getMessageObject());					
+					
+					throw new OrderServiceException(cse.getMessages());					
 				}
 			}
 			
@@ -105,7 +107,7 @@ public class OrderServiceImpl implements OrderService {
 			}
 			
 			try {
-				inventoryService.confirm(transactionData);
+				inventoryService.confirm(transactionData, order);
 			} catch (InventoryServiceException ise) {
 				log.error(ExceptionUtils.getStackTrace(ise));
 			}
