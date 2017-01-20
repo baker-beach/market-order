@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.jms.JMSException;
 import javax.jms.Message;
 
+import org.apache.camel.ProducerTemplate;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +39,6 @@ import com.bakerbeach.market.inventory.api.service.InventoryServiceException;
 import com.bakerbeach.market.order.api.model.OrderList;
 import com.bakerbeach.market.order.api.service.OrderService;
 import com.bakerbeach.market.order.api.service.OrderServiceException;
-import com.bakerbeach.market.payment.api.model.PaymentInfo;
 import com.bakerbeach.market.payment.api.service.PaymentService;
 import com.bakerbeach.market.payment.api.service.PaymentServiceException;
 import com.bakerbeach.market.sequence.service.SequenceService;
@@ -59,6 +59,9 @@ public class OrderServiceImpl implements OrderService {
 	private OrderDao orderDao;
 
 	private static final String ORDER_ID_SEQUENCE_POSTFIX = "_order_id";
+	
+	@Autowired
+	private ProducerTemplate producerTemplate;
 
 	private JmsTemplate orderJmsTemplate;
 
@@ -127,23 +130,15 @@ public class OrderServiceImpl implements OrderService {
 		}
 	}
 
-	private void sendOrderMessage(Order order) {
-		try {
-			Map<String, Object> payload = new HashMap<String, Object>();
-			payload.put("order_id", order.getId());
-			payload.put("shop_code", order.getShopCode());
-			orderJmsTemplate.convertAndSend(payload, new MessagePostProcessor() {
-				@Override
-				public Message postProcessMessage(Message msg) throws JMSException {
-					msg.setJMSType("ORDER");
-					return msg;
-				}
-			});
-		} catch(Exception e) {
-			log.error(ExceptionUtils.getStackTrace(e));
-		}
-	}
+	protected void sendOrderMessage(Order order) {
+		
+		Map<String, Object> payload = new HashMap<String, Object>();
+		payload.put("order_id", order.getId());
+		payload.put("shop_code", order.getShopCode());
 
+		producerTemplate.sendBody("direct:order", payload);
+	}
+	
 	private void sendInventoryMessages(String shopCode, TransactionData transactionData) {
 		if (inventoryJmsTemplate != null) {
 			try {
