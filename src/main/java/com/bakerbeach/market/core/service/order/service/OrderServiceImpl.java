@@ -1,20 +1,15 @@
 package com.bakerbeach.market.core.service.order.service;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
-
+import org.apache.camel.ProducerTemplate;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.core.MessagePostProcessor;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.bakerbeach.market.cart.api.service.CartService;
 import com.bakerbeach.market.cart.api.service.CartServiceException;
@@ -38,7 +33,6 @@ import com.bakerbeach.market.inventory.api.service.InventoryServiceException;
 import com.bakerbeach.market.order.api.model.OrderList;
 import com.bakerbeach.market.order.api.service.OrderService;
 import com.bakerbeach.market.order.api.service.OrderServiceException;
-import com.bakerbeach.market.payment.api.model.PaymentInfo;
 import com.bakerbeach.market.payment.api.service.PaymentService;
 import com.bakerbeach.market.payment.api.service.PaymentServiceException;
 import com.bakerbeach.market.sequence.service.SequenceService;
@@ -60,9 +54,9 @@ public class OrderServiceImpl implements OrderService {
 
 	private static final String ORDER_ID_SEQUENCE_POSTFIX = "_order_id";
 
-	private JmsTemplate orderJmsTemplate;
-
-	private JmsTemplate inventoryJmsTemplate;
+	@Autowired
+	@Qualifier("producerTemplate")
+	private ProducerTemplate producerTemplate;
 
 	@Override
 	public Order order(Cart cart, Customer customer, ShopContext shopContext) throws OrderServiceException {
@@ -114,8 +108,6 @@ public class OrderServiceImpl implements OrderService {
 			
 			sendOrderMessage(order);
 			
-			sendInventoryMessages(order.getShopCode(), transactionData);
-
 			return order;
 		} catch (OrderServiceException e) {
 			try {
@@ -132,39 +124,10 @@ public class OrderServiceImpl implements OrderService {
 			Map<String, Object> payload = new HashMap<String, Object>();
 			payload.put("order_id", order.getId());
 			payload.put("shop_code", order.getShopCode());
-			orderJmsTemplate.convertAndSend(payload, new MessagePostProcessor() {
-				@Override
-				public Message postProcessMessage(Message msg) throws JMSException {
-					msg.setJMSType("ORDER");
-					return msg;
-				}
-			});
+			
+			producerTemplate.sendBody("direct:order", payload);
 		} catch(Exception e) {
 			log.error(ExceptionUtils.getStackTrace(e));
-		}
-	}
-
-	private void sendInventoryMessages(String shopCode, TransactionData transactionData) {
-		if (inventoryJmsTemplate != null) {
-			try {
-				List<String> gtins = new ArrayList<String>();
-				for (OrderItem orderItem : transactionData.getBookedItems()) {
-					gtins.add(orderItem.getGtin());
-				}
-				
-				Map<String, Object> payload = new HashMap<String, Object>();
-				payload.put("shop_code", shopCode);
-				payload.put("gtins", gtins);
-				inventoryJmsTemplate.convertAndSend(payload, new MessagePostProcessor() {
-					@Override
-					public Message postProcessMessage(Message msg) throws JMSException {
-						msg.setJMSType("ORDER");
-						return msg;
-					}
-				});
-			} catch(Exception e) {
-				log.error(ExceptionUtils.getStackTrace(e));
-			}
 		}
 	}
 
@@ -314,21 +277,6 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	/**
-	 * @return the orderJmsTemplate
-	 */
-	public JmsTemplate getOrderJmsTemplate() {
-		return orderJmsTemplate;
-	}
-
-	/**
-	 * @param orderJmsTemplate
-	 *            the orderJmsTemplate to set
-	 */
-	public void setOrderJmsTemplate(JmsTemplate orderJmsTemplate) {
-		this.orderJmsTemplate = orderJmsTemplate;
-	}
-
-	/**
 	 * @return the inventoryService
 	 */
 	public InventoryService getInventoryService() {
@@ -341,21 +289,6 @@ public class OrderServiceImpl implements OrderService {
 	 */
 	public void setInventoryService(InventoryService inventoryService) {
 		this.inventoryService = inventoryService;
-	}
-
-	/**
-	 * @return the inventoryJmsTemplate
-	 */
-	public JmsTemplate getInventoryJmsTemplate() {
-		return inventoryJmsTemplate;
-	}
-
-	/**
-	 * @param inventoryJmsTemplate
-	 *            the inventoryJmsTemplate to set
-	 */
-	public void setInventoryJmsTemplate(JmsTemplate inventoryJmsTemplate) {
-		this.inventoryJmsTemplate = inventoryJmsTemplate;
 	}
 
 }
