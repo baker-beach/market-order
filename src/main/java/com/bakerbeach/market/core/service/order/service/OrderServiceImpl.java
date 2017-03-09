@@ -41,7 +41,7 @@ import com.bakerbeach.market.sequence.service.SequenceServiceException;
 public class OrderServiceImpl implements OrderService {
 	protected static final Logger log = LoggerFactory.getLogger(OrderServiceImpl.class.getSimpleName());
 	
-	@Autowired
+	@Autowired(required=false)
 	private CartService cartService;
 	
 	private SequenceService sequenceService;
