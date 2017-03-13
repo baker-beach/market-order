@@ -11,8 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import com.bakerbeach.market.cart.api.service.CartService;
-import com.bakerbeach.market.cart.api.service.CartServiceException;
 import com.bakerbeach.market.commons.MessageImpl;
 import com.bakerbeach.market.core.api.model.Cart;
 import com.bakerbeach.market.core.api.model.CartItem;
@@ -37,12 +35,14 @@ import com.bakerbeach.market.payment.api.service.PaymentService;
 import com.bakerbeach.market.payment.api.service.PaymentServiceException;
 import com.bakerbeach.market.sequence.service.SequenceService;
 import com.bakerbeach.market.sequence.service.SequenceServiceException;
+import com.bakerbeach.market.xcart.api.service.XCartService;
+import com.bakerbeach.market.xcart.api.service.XCartServiceException;
 
 public class OrderServiceImpl implements OrderService {
 	protected static final Logger log = LoggerFactory.getLogger(OrderServiceImpl.class.getSimpleName());
 	
 	@Autowired(required=false)
-	private CartService cartService;
+	private XCartService cartService;
 	
 	private SequenceService sequenceService;
 
@@ -76,17 +76,17 @@ public class OrderServiceImpl implements OrderService {
 				throw new OrderServiceException(ise.getMessages());
 			}
 
-			if (!cart.getCoupons().isEmpty()) {
-				try {
-					Coupon coupon = cart.getCoupons().get(0);
-					cartService.setIndividualUse(coupon, customer.getId(), order.getId(), cart, shopContext.getShopCode());
-					coupon.getCode();
-				} catch (CartServiceException cse) {
-					cart.getCoupons().clear();
-					
-					throw new OrderServiceException(cse.getMessages());					
-				}
-			}
+//			if (!cart.getCoupons().isEmpty()) {
+//				try {
+//					Coupon coupon = cart.getCoupons().get(0);
+//					cartService.setIndividualUse(coupon, customer.getId(), order.getId(), cart, shopContext.getShopCode());
+//					coupon.getCode();
+//				} catch (XCartServiceException cse) {
+//					cart.getCoupons().clear();
+//					
+//					throw new OrderServiceException(cse.getMessages());					
+//				}
+//			}
 			
 			try {
 				paymentService.doOrder(order);
@@ -211,7 +211,7 @@ public class OrderServiceImpl implements OrderService {
 		orderItem.setQuantity(cartItem.getQuantity());
 		orderItem.setDiscount(cartItem.getDiscount());
 		orderItem.setVolatile(cartItem.isVolatile());
-		orderItem.setUnitPrice(cartItem.getUnitPrice());
+//		orderItem.setUnitPrice(cartItem.getUnitPrice());
 		orderItem.setTotalPrice(cartItem.getTotalPrice());
 		orderItem.setTaxCode(cartItem.getTaxCode());
 		orderItem.setTaxPercent(cartItem.getTaxPercent());
