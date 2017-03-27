@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.bakerbeach.market.core.api.model.Address;
 import com.bakerbeach.market.core.api.model.Order;
@@ -192,6 +193,51 @@ public class SimpleOrder extends HashMap<String, Object> implements Order {
 
 	public void setPaymentTransactionId(String paymentTransactionId) {
 		put(PAYMENT_TRANSACTION_ID, paymentTransactionId);
+	}
+
+	@Override
+	public String getCurrencyCode() {
+		throw new RuntimeException("not implemented");
+	}
+
+	@Override
+	public Map<String, OrderItem> getAllItems() {
+		throw new RuntimeException("not implemented");
+	}
+
+	@Override
+	public OrderItem getItem(String key) {
+		throw new RuntimeException("not implemented");
+	}
+
+	@Override
+	public Map<String, Object> getAllAttributes() {
+		throw new RuntimeException("not implemented");
+	}
+
+	@Override
+	public String getStatus() {
+		throw new RuntimeException("not implemented");
+	}
+
+	@Override
+	public void setCurrencyCode(String currencyCode) {
+		throw new RuntimeException("not implemented");
+	}
+
+	@Override
+	public void addItem(Object newOrderItem) {
+		throw new RuntimeException("not implemented");
+	}
+
+	@Override
+	public void addAttributes(Map<String, Object> map) {
+		throw new RuntimeException("not implemented");
+	}
+
+	@Override
+	public void addItem(OrderItem item) {
+		throw new RuntimeException("not implemented");
 	}
 
 }

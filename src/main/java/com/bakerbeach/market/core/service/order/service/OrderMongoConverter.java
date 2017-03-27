@@ -47,7 +47,14 @@ public class OrderMongoConverter {
 						Object value = tmpItem.get(itemKey);
 						if (value instanceof Double) {
 							orderItem.put(itemKey, new BigDecimal((Double) value));
-						} else if (itemKey.equals("components")) {
+						} 
+						else if (itemKey.equals("options")) {
+							DBObject dbObject = (DBObject) value;
+							
+						}
+						
+						
+						else if (itemKey.equals("components")) {
 							DBObject dbObject = (DBObject) value;
 							for (String componentKey : dbObject.keySet()) {
 								DBObject componentObject = (DBObject) dbObject.get(componentKey);

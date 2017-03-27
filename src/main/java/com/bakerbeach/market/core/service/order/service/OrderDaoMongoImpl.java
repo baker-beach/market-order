@@ -3,6 +3,8 @@ package com.bakerbeach.market.core.service.order.service;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import com.bakerbeach.market.core.api.model.Order;
+import com.bakerbeach.market.core.service.order.dao.OrderDao;
+import com.bakerbeach.market.core.service.order.dao.OrderDaoException;
 import com.bakerbeach.market.core.service.order.model.OrderListImpl;
 import com.bakerbeach.market.core.service.order.model.SimpleOrder;
 import com.bakerbeach.market.order.api.model.OrderList;
@@ -87,6 +89,11 @@ public class OrderDaoMongoImpl implements OrderDao {
 
 	public void setCollectionName(String collectionName) {
 		this.collectionName = collectionName;
+	}
+
+	@Override
+	public Order newInstance() throws InstantiationException, IllegalAccessException {
+		throw new RuntimeException("not implemented");
 	}
 
 }
