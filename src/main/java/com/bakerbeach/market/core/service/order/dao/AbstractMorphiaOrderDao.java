@@ -4,6 +4,7 @@ import org.mongodb.morphia.AdvancedDatastore;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 
+import com.bakerbeach.market.core.api.model.Cart;
 import com.bakerbeach.market.core.api.model.Order;
 import com.bakerbeach.market.core.service.order.model.SimpleOrder;
 import com.bakerbeach.market.order.api.model.OrderList;

@@ -227,5 +227,10 @@ public class XOrderImpl implements Order {
 	public String getPaymentTransactionId() {
 		return paymentTransactionId;
 	}
+	
+	@Override
+	public OrderItem newItem() {
+		return new XOrderItemImpl();
+	}
 
 }

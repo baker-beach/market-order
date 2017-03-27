@@ -240,4 +240,9 @@ public class SimpleOrder extends HashMap<String, Object> implements Order {
 		throw new RuntimeException("not implemented");
 	}
 
+	@Override
+	public OrderItem newItem() {
+		throw new RuntimeException("not implemented");
+	}
+
 }

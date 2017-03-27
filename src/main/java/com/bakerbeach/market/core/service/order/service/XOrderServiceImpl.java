@@ -1,6 +1,5 @@
 package com.bakerbeach.market.core.service.order.service;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +24,6 @@ import com.bakerbeach.market.core.api.model.ShopContext;
 import com.bakerbeach.market.core.service.order.dao.OrderDao;
 import com.bakerbeach.market.core.service.order.dao.OrderDaoException;
 import com.bakerbeach.market.core.service.order.model.SimpleOrder;
-import com.bakerbeach.market.core.service.order.model.XOrderItemImpl;
 import com.bakerbeach.market.inventory.api.model.TransactionData;
 import com.bakerbeach.market.inventory.api.service.InventoryService;
 import com.bakerbeach.market.inventory.api.service.InventoryServiceException;
@@ -194,8 +192,8 @@ public class XOrderServiceImpl implements OrderService {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private Order newOrder(Cart cart, Customer customer, ShopContext shopContext) throws OrderServiceException {
-
 		try {
 			Order order = orderDaos.get(shopContext.getShopCode()).newInstance();
 
@@ -213,19 +211,23 @@ public class XOrderServiceImpl implements OrderService {
 			order.setCreatedAt(new Date());
 
 			cart.getItems().forEach((k, ci) -> {
-				order.addItem(newOrderItem(ci));
+				try {
+					order.addItem(newOrderItem(ci, order));
+				} catch (OrderServiceException e) {
+					log.error(ExceptionUtils.getStackTrace(e));
+				}
 			});
 
 			return order;
 		} catch (InstantiationException | IllegalAccessException e) {
 			throw new OrderServiceException();
 		}
-		
+
 	}
-
-	private OrderItem newOrderItem(CartItem ci) {
-		OrderItem oi = new XOrderItemImpl();
-
+	
+	private OrderItem newOrderItem(CartItem ci, Order order) throws OrderServiceException {
+		OrderItem oi = order.newItem();
+		
 		oi.setCode(ci.getCode());
 		oi.setGtin(ci.getGtin());
 		oi.setBrand(ci.getBrand());
@@ -240,47 +242,26 @@ public class XOrderServiceImpl implements OrderService {
 		oi.setQualifier(ci.getQualifier());
 		oi.setTitle(ci.getTitle());
 		oi.setImages(ci.getImages());
+		
+		ci.getOptions().forEach((key, cio) -> {
+			OrderItem.Option option = newOption(cio, oi);
+			oi.getAllOptions().put(option.getCode(), option);
+		});
 
 		return oi;
 	}
+	
+	private OrderItem.Option newOption(CartItem.Option cio, OrderItem oi) {
+		OrderItem.Option option = oi.newOption(cio.getCode());
 
-	/*
-	 * private OrderItem buildOrderItem(CartItem cartItem) { SimpleOrderItem
-	 * orderItem = new SimpleOrderItem();
-	 * 
-	 * orderItem.setGtin(cartItem.getGtin());
-	 * orderItem.setBrand(cartItem.getBrand());
-	 * orderItem.setSupplier(cartItem.getSupplier());
-	 * orderItem.setQuantity(cartItem.getQuantity());
-	 * orderItem.setDiscount(cartItem.getDiscount());
-	 * orderItem.setVolatile(cartItem.isVolatile());
-	 * orderItem.setUnitPrice(cartItem.getUnitPrice());
-	 * orderItem.setTotalPrice(cartItem.getTotalPrice());
-	 * orderItem.setTaxCode(cartItem.getTaxCode());
-	 * orderItem.setTaxPercent(cartItem.getTaxPercent());
-	 * orderItem.setQualifier(cartItem.getQualifier());
-	 * orderItem.setTitle1(cartItem.getTitle1());
-	 * orderItem.setTitle2(cartItem.getTitle2());
-	 * orderItem.setTitle2(cartItem.getTitle3());
-	 * orderItem.setImageUrl1(cartItem.getImageUrl1());
-	 * orderItem.setImageUrl2(cartItem.getImageUrl2());
-	 * orderItem.setSize(cartItem.getSize());
-	 * orderItem.setColor(cartItem.getColor());
-	 * 
-	 * orderItem.getAttributes().putAll(cartItem.getAttributes());
-	 * 
-	 * for (Entry<String, Option> entry : cartItem.getOptions().entrySet()) {
-	 * Option option = entry.getValue();
-	 * 
-	 * SimpleOrderItemOption soio = new SimpleOrderItemOption(option.getGtin());
-	 * soio.setQuantity(option.getQuantity().intValue());
-	 * soio.setTitle(option.getTitle());
-	 * soio.setUnitPrices(option.getUnitPrices());
-	 * 
-	 * orderItem.getOptions().put(entry.getKey(), soio); }
-	 * 
-	 * return orderItem; }
-	 */
+		option.setGtin(cio.getGtin());
+		option.setQuantity(cio.getQuantity());
+		option.setTag(cio.getTag());
+		option.setUnitPrices(cio.getUnitPrices());
+		option.setTitle(cio.getTitle());
+				
+		return option;		
+	}
 
 	public SequenceService getSequenceService() {
 		return sequenceService;

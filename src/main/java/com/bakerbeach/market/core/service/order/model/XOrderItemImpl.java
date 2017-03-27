@@ -259,6 +259,10 @@ public class XOrderItemImpl implements OrderItem {
 		this.color = color;
 	}
 
+	@Override
+	public Option newOption(String code) {
+		return new OptionImpl(code);
+	}
 
 	@Override
 	public String toString() {
@@ -368,6 +372,11 @@ public class XOrderItemImpl implements OrderItem {
 	}
 	
 	@Override
+	public void setOptions(Map<String, Option> options) {
+		this.options = options;
+	}
+	
+	@Override
 	@Deprecated
 	public Map<String, OrderItemOption> getOptions() {
 		throw new RuntimeException("not implemented");
@@ -388,6 +397,13 @@ public class XOrderItemImpl implements OrderItem {
 		private String tag;
 		protected Map<String, String> title = new HashMap<>();
 
+		public OptionImpl() {
+		}
+		
+		public OptionImpl(String code) {
+			this.code = code;
+		}
+		
 		public OptionImpl(String code, String tag) {
 			this.code = code;
 			this.tag = tag;
@@ -435,6 +451,11 @@ public class XOrderItemImpl implements OrderItem {
 		}
 
 		@Override
+		public void setUnitPrices(Map<String, BigDecimal> unitPrices) {
+			this.unitPrices = unitPrices;
+		}
+		
+		@Override
 		public void setUnitPrice(String key, BigDecimal value) {
 			unitPrices.put(key, value);
 		}
@@ -470,6 +491,11 @@ public class XOrderItemImpl implements OrderItem {
 		@Override
 		public Map<String, String> getTitle() {
 			return title;
+		}
+		
+		@Override
+		public void setTitle(Map<String, String> title) {
+			this.title = title;
 		}
 
 		@Override

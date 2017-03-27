@@ -461,4 +461,15 @@ public class SimpleOrderItem extends HashMap<String, Object> implements OrderIte
 		throw new RuntimeException("not implemented");
 	}
 
+	@Override
+	public void setOptions(Map<String, Option> options) {
+		throw new RuntimeException("not implemented");
+		
+	}
+
+	@Override
+	public Option newOption(String code) {
+		throw new RuntimeException("not implemented");
+	}
+
 }
