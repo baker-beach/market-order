@@ -136,7 +136,7 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public Order cancelOrder(String orderId) throws OrderServiceException {
 		try {
-			SimpleOrder order = orderDao.findById(orderId);
+			Order order = orderDao.findById(orderId);
 			order.setStatus(Order.STATUS_CANCELED);
 			orderDao.saveOrUpdateOrder(order);
 			paymentService.doCancel(order);
@@ -175,12 +175,8 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public OrderList findOrderByCustomerIdAndShopCode(String customerId, String shopCode, Integer limit, Integer offset) throws OrderServiceException {
-		try {
-			return orderDao.findByCustomerId(customerId, shopCode, null, limit, offset);
-		} catch (OrderDaoException e) {
-			throw new OrderServiceException();
-		}
+	public OrderList findOrderByCustomerIdAndShopCode(String customerId, String shopCode, String sort, Integer limit, Integer offset) throws OrderServiceException {
+		throw new RuntimeException("not implemented");
 	}
 
 	@SuppressWarnings({ "unchecked", "deprecation" })

@@ -1,8 +1,6 @@
 package com.bakerbeach.market.core.service.order.dao;
 
-import com.bakerbeach.market.core.api.model.Cart;
 import com.bakerbeach.market.core.api.model.Order;
-import com.bakerbeach.market.core.service.order.model.SimpleOrder;
 import com.bakerbeach.market.order.api.model.OrderList;
 import com.mongodb.DBObject;
 
@@ -10,9 +8,14 @@ public interface OrderDao {
 
 	void saveOrUpdateOrder(Order order) throws OrderDaoException;
 
-	SimpleOrder findById(String id) throws OrderDaoException;
+	Order findById(String id) throws OrderDaoException;
 
-	OrderList findByCustomerId(String customerId, String shopCode, DBObject orderBy, Integer limit, Integer offset) throws OrderDaoException;
+	@Deprecated
+	OrderList findByCustomerId(String customerId, String shopCode, DBObject orderBy, Integer limit, Integer offset)
+			throws OrderDaoException;
+
+	OrderList findByCustomerIdAndShop(String customerId, String shopCode, String orderBy, Integer limit, Integer offset)
+			throws OrderDaoException;
 
 	Order newInstance() throws InstantiationException, IllegalAccessException;
 

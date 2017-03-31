@@ -39,7 +39,6 @@ public class OrderDaoMongoImpl implements OrderDao {
 
 	@Override
 	public OrderList findByCustomerId(String customerId, String shopCode, DBObject orderBy, Integer limit, Integer offset) throws OrderDaoException {
-
 		try {
 			OrderListImpl orderList = new OrderListImpl();
 			QueryBuilder qb = QueryBuilder.start();
@@ -63,12 +62,17 @@ public class OrderDaoMongoImpl implements OrderDao {
 				orderList.add(OrderMongoConverter.decode(cur.next()));
 			}
 
-			orderList.setCount(orderList.size());
+			orderList.setCount(new Long(cur.count()));
 			return orderList;
 		} catch (Exception e) {
 			throw new OrderDaoException();
 		}
-
+	}
+	
+	@Override
+	public OrderList findByCustomerIdAndShop(String customerId, String shopCode, String orderBy, Integer limit,
+			Integer offset) throws OrderDaoException {
+		throw new RuntimeException("not implemented");
 	}
 
 	public MongoTemplate getMongoShopTemplate() {

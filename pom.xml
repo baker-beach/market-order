@@ -36,7 +36,7 @@
 		</dependency>
 		<dependency>
             <groupId>com.bakerbeach.market</groupId>
-			<artifactId>market-address-api</artifactId>
+			<artifactId>market-address</artifactId>
             <version>[1.0.0,2.0.0)</version>
 		</dependency>
 		<dependency>

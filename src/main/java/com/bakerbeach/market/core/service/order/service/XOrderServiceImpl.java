@@ -23,7 +23,6 @@ import com.bakerbeach.market.core.api.model.OrderItem;
 import com.bakerbeach.market.core.api.model.ShopContext;
 import com.bakerbeach.market.core.service.order.dao.OrderDao;
 import com.bakerbeach.market.core.service.order.dao.OrderDaoException;
-import com.bakerbeach.market.core.service.order.model.SimpleOrder;
 import com.bakerbeach.market.inventory.api.model.TransactionData;
 import com.bakerbeach.market.inventory.api.service.InventoryService;
 import com.bakerbeach.market.inventory.api.service.InventoryServiceException;
@@ -139,7 +138,7 @@ public class XOrderServiceImpl implements OrderService {
 	@Override
 	public Order cancelOrder(String shopCode, String orderId) throws OrderServiceException {
 		try {
-			SimpleOrder order = orderDaos.get(shopCode).findById(orderId);
+			Order order = orderDaos.get(shopCode).findById(orderId);
 			order.setStatus(Order.STATUS_CANCELED);
 			orderDaos.get(shopCode).saveOrUpdateOrder(order);
 			paymentService.doCancel(order);
@@ -160,11 +159,6 @@ public class XOrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public Order findOrderById(String orderId) throws OrderServiceException {
-		throw new RuntimeException("not implemented");
-	}
-
-	@Override
 	public Order findOrderById(String shopCode, String orderId) throws OrderServiceException {
 		try {
 			return orderDaos.get(shopCode).findById(orderId);
@@ -175,18 +169,14 @@ public class XOrderServiceImpl implements OrderService {
 
 	@Override
 	public OrderList findOrderByCustomerIdAndShopCode(String customerId, String shopCode) throws OrderServiceException {
-		try {
-			return orderDaos.get(shopCode).findByCustomerId(customerId, shopCode, null, null, null);
-		} catch (OrderDaoException e) {
-			throw new OrderServiceException();
-		}
+		return findOrderByCustomerIdAndShopCode(customerId, shopCode, "-id", null, null);
 	}
 
 	@Override
-	public OrderList findOrderByCustomerIdAndShopCode(String customerId, String shopCode, Integer limit, Integer offset)
-			throws OrderServiceException {
+	public OrderList findOrderByCustomerIdAndShopCode(String customerId, String shopCode, String sort, Integer limit,
+			Integer offset) throws OrderServiceException {
 		try {
-			return orderDaos.get(shopCode).findByCustomerId(customerId, shopCode, null, limit, offset);
+			return orderDaos.get(shopCode).findByCustomerIdAndShop(customerId, shopCode, "-id", limit, offset);
 		} catch (OrderDaoException e) {
 			throw new OrderServiceException();
 		}
@@ -289,6 +279,12 @@ public class XOrderServiceImpl implements OrderService {
 
 	public void setInventoryService(InventoryService inventoryService) {
 		this.inventoryService = inventoryService;
+	}
+
+	@Override
+	public Order findOrderById(String orderId) throws OrderServiceException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
