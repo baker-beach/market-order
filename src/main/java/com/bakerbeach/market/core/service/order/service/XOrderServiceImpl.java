@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.camel.ProducerTemplate;
+import org.apache.commons.collections4.functors.CatchAndRethrowClosure;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,6 +90,9 @@ public class XOrderServiceImpl implements OrderService {
 
 			try {
 				paymentService.doOrder(order);
+				
+				// TODO: get order status from payment serviec
+				order.setStatus(Order.STATUS_SUBMIT);
 			} catch (PaymentServiceException pse) {
 				throw new OrderServiceException(pse.getMessages());
 			}
@@ -104,7 +108,7 @@ public class XOrderServiceImpl implements OrderService {
 			} catch (InventoryServiceException ise) {
 				log.error(ExceptionUtils.getStackTrace(ise));
 			}
-
+			
 			sendOrderMessage(order);
 
 			return order;
