@@ -195,7 +195,7 @@ public class XOrderServiceImpl implements OrderService {
 			order.setTotal(cart.getTotal().getGross());
 			order.setBillingAddress(shopContext.getBillingAddress());
 			order.setShippingAddress(shopContext.getShippingAddress());
-			order.setStatus(Order.STATUS_SUBMIT);
+			order.setStatus(Order.STATUS_TMP);
 			order.addAttributes(
 					(HashMap<String, Object>) shopContext.getSessionData().get(ADDITIONAL_ORDER_INFORMATIONS));
 			order.setCreatedAt(new Date());
