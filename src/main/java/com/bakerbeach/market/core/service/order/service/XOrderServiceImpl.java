@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.camel.ProducerTemplate;
-import org.apache.commons.collections4.functors.CatchAndRethrowClosure;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -197,8 +196,16 @@ public class XOrderServiceImpl implements OrderService {
 			order.setShopCode(shopContext.getShopCode());
 			order.setCurrencyCode(shopContext.getCurrentCurrency().getIsoCode());
 			order.setTotal(cart.getTotal().getGross());
-			order.setBillingAddress(shopContext.getBillingAddress());
-			order.setShippingAddress(shopContext.getShippingAddress());
+			
+
+			
+			
+			order.setBillingAddress(order.newAddress(shopContext.getBillingAddress()));
+			order.setShippingAddress(order.newAddress(shopContext.getShippingAddress()));
+			
+			
+			
+			
 			order.setStatus(Order.STATUS_TMP);
 			order.addAttributes(
 					(HashMap<String, Object>) shopContext.getSessionData().get(ADDITIONAL_ORDER_INFORMATIONS));

@@ -15,7 +15,7 @@ import com.bakerbeach.market.core.api.model.OrderItem.OrderItemComponent;
 import com.bakerbeach.market.core.api.model.OrderItem.OrderItemOption;
 import com.bakerbeach.market.core.api.model.TaxCode;
 import com.bakerbeach.market.core.api.model.Text;
-import com.bakerbeach.market.core.service.order.model.OrderAddress;
+import com.bakerbeach.market.core.service.order.model.OrderAddressImpl;
 import com.bakerbeach.market.core.service.order.model.SimpleOrder;
 import com.bakerbeach.market.core.service.order.model.SimpleOrderItem;
 import com.bakerbeach.market.core.service.order.model.SimpleOrderItem.SimpleOrderItemComponent;
@@ -164,7 +164,7 @@ public class OrderMongoConverter {
 	}
 
 	public static Address decodeAddress(DBObject source) {
-		OrderAddress address = new OrderAddress();
+		OrderAddressImpl address = new OrderAddressImpl();
 
 		address.setFirstName((String) source.get("first_name"));
 		address.setLastName((String) source.get("last_name"));

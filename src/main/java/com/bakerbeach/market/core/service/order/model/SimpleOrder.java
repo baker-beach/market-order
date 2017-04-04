@@ -132,6 +132,31 @@ public class SimpleOrder extends HashMap<String, Object> implements Order {
 	public void setBillingAddress(Address billingAddress) {
 		this.billingAddress = billingAddress;
 	}
+	
+	@Override
+	public Address newAddress(Address source) {
+		OrderAddressImpl target = new OrderAddressImpl();
+
+		target.setPrefix(source.getPrefix());
+		target.setFirstName(source.getFirstName());
+		target.setLastName(source.getLastName());
+		target.setMiddleName(source.getMiddleName());
+		target.setSuffix(source.getSuffix());
+		target.setStreet1(source.getStreet1());
+		target.setStreet2(source.getStreet2());
+		target.setPostcode(source.getPostcode());
+		target.setCity(source.getCity());
+		target.setRegion(source.getRegion());
+		target.setCountryCode(source.getCountryCode());
+		target.setEmail(source.getEmail());
+		target.setTelephone(source.getTelephone());
+		target.setFax(source.getFax());
+		target.setCompany(source.getCompany());
+		target.setCreatedAt(source.getCreatedAt());
+		target.setUpdatedAt(source.getUpdatedAt());
+
+		return target;
+	}
 
 	/**
 	 * @return the items
