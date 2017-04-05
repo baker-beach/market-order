@@ -155,7 +155,10 @@ public class XOrderServiceImpl implements OrderService {
 	@Override
 	public String getNextOrderId(ShopContext shopContext) throws OrderServiceException {
 		try {
-			return sequenceService.generateId(shopContext.getShopCode() + ORDER_ID_SEQUENCE_POSTFIX).toString();
+			String key = shopContext.getOrderSequenceCode() + ORDER_ID_SEQUENCE_POSTFIX;
+			Long maxRandomOffset = shopContext.getOrderSequenceRandomOffset();
+			
+			return sequenceService.generateId(key, maxRandomOffset).toString();
 		} catch (SequenceServiceException e) {
 			throw new OrderServiceException();
 		}
