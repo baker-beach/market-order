@@ -292,13 +292,13 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public Order cancelOrder(String shopCode, String orderId) throws OrderServiceException {
 		log.warn("unsupported parameter shopCode");
-		return findOrderById(orderId);
+		return cancelOrder(orderId);	
 	}
 
 	@Override
 	public Order findOrderById(String shopCode, String orderId) throws OrderServiceException {
 		log.warn("unsupported parameter shopCode");
-		return cancelOrder(orderId);
+		return findOrderById(orderId);
 	}
 
 }
