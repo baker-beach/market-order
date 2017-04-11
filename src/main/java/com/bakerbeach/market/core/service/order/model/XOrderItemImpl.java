@@ -377,6 +377,13 @@ public class XOrderItemImpl implements OrderItem {
 	}
 	
 	@Override
+	public void putOption(String key, Option option) {
+		if (option instanceof OptionImpl) {
+			options.put(key, (OptionImpl) option);
+		}
+	}
+	
+	@Override
 	@Deprecated
 	public Map<String, OrderItemOption> getOptions() {
 		throw new RuntimeException("not implemented");

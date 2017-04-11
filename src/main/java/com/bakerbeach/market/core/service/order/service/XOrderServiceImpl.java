@@ -198,22 +198,13 @@ public class XOrderServiceImpl implements OrderService {
 			order.setId(shopContext.getOrderId());
 			order.setShopCode(shopContext.getShopCode());
 			order.setCurrencyCode(shopContext.getCurrentCurrency().getIsoCode());
-			order.setTotal(cart.getTotal().getGross());
-			
-
-			
-			
+			order.setTotal(order.newTotal(cart.getTotal()));
 			order.setBillingAddress(order.newAddress(shopContext.getBillingAddress()));
 			order.setShippingAddress(order.newAddress(shopContext.getShippingAddress()));
-			
-			
-			
-			
 			order.setStatus(Order.STATUS_TMP);
 			order.addAttributes(
 					(HashMap<String, Object>) shopContext.getSessionData().get(ADDITIONAL_ORDER_INFORMATIONS));
 			order.setCreatedAt(new Date());
-
 			cart.getItems().forEach((k, ci) -> {
 				try {
 					order.addItem(newOrderItem(ci, order));
@@ -249,7 +240,7 @@ public class XOrderServiceImpl implements OrderService {
 		
 		ci.getOptions().forEach((key, cio) -> {
 			OrderItem.Option option = newOption(cio, oi);
-			oi.getAllOptions().put(option.getCode(), option);
+			oi.putOption(option.getCode(), option);
 		});
 
 		return oi;

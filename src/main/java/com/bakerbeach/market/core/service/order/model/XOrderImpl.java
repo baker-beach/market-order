@@ -14,13 +14,17 @@ import org.mongodb.morphia.annotations.Id;
 import com.bakerbeach.market.core.api.model.Address;
 import com.bakerbeach.market.core.api.model.Order;
 import com.bakerbeach.market.core.api.model.OrderItem;
+import com.bakerbeach.market.core.api.model.Total;
+import com.bakerbeach.market.core.api.model.Total.Line;
+import com.bakerbeach.market.core.service.order.model.XOrderTotalImpl.LineImpl;
 
+//@Entity(value = "order", noClassnameStored = false)
 public class XOrderImpl implements Order {
 	@Id
 	protected String id;
 	protected String shopCode;
 	protected String currencyCode;
-	protected BigDecimal total;
+	protected Total total;
 	protected String customerId;
 	protected Address shippingAddress;
 	protected Address billingAddress;
@@ -78,15 +82,26 @@ public class XOrderImpl implements Order {
 	}
 
 	@Override
+	@Deprecated
 	public BigDecimal getTotal() {
-		return total;
+		return total.getGross();
 	}
 
 	@Override
+	@Deprecated
 	public void setTotal(BigDecimal total) {
-		this.total = total;
+		throw new RuntimeException("not supported anymore");
 	}
 	
+	public Total getTotal(Boolean asObject) {
+		return total;
+	}
+	
+	@Override
+	public void setTotal(Total total) {
+		this.total = total;
+	}
+		
 	@Override
 	public String getCustomerId() {
 		return customerId;
@@ -133,6 +148,33 @@ public class XOrderImpl implements Order {
 	}
 	
 	@Override
+	public Total newTotal(Total source) {
+		XOrderTotalImpl target = new XOrderTotalImpl();
+		
+		target.setQualifier(source.getQualifier());
+		target.setQuantity(source.getQuantity());
+		target.setGross(source.getGross());
+		target.setNet(source.getNet());
+		
+		source.getLines().forEach((k,v) -> {
+			target.putLine(k, newTotalLine(v));
+		});
+		
+		return target;
+	}
+
+	private Line newTotalLine(Line source) {
+		XOrderTotalImpl.LineImpl target = new LineImpl(source.getTaxCode(), source.getTaxPercent());
+
+		target.setQuantity(source.getQuantity());
+		target.setGross(source.getGross());
+		target.setNet(source.getNet());
+		target.setTax(source.getTax());
+
+		return target;
+	}
+	
+	@Override
 	public Address getBillingAddress() {
 		return billingAddress;
 	}
@@ -149,7 +191,7 @@ public class XOrderImpl implements Order {
 	}
 	
 	@Override
-	public Map<String, OrderItem> getAllItems() {
+	public Map<String, OrderItem> getItems(Boolean asObject) {
 		return items;
 	}
 	

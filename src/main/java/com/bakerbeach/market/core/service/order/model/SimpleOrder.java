@@ -10,6 +10,7 @@ import java.util.Map;
 import com.bakerbeach.market.core.api.model.Address;
 import com.bakerbeach.market.core.api.model.Order;
 import com.bakerbeach.market.core.api.model.OrderItem;
+import com.bakerbeach.market.core.api.model.Total;
 
 public class SimpleOrder extends HashMap<String, Object> implements Order {
 
@@ -132,7 +133,7 @@ public class SimpleOrder extends HashMap<String, Object> implements Order {
 	public void setBillingAddress(Address billingAddress) {
 		this.billingAddress = billingAddress;
 	}
-	
+
 	@Override
 	public Address newAddress(Address source) {
 		OrderAddressImpl target = new OrderAddressImpl();
@@ -226,11 +227,6 @@ public class SimpleOrder extends HashMap<String, Object> implements Order {
 	}
 
 	@Override
-	public Map<String, OrderItem> getAllItems() {
-		throw new RuntimeException("not implemented");
-	}
-
-	@Override
 	public OrderItem getItem(String key) {
 		throw new RuntimeException("not implemented");
 	}
@@ -267,6 +263,26 @@ public class SimpleOrder extends HashMap<String, Object> implements Order {
 
 	@Override
 	public OrderItem newItem() {
+		throw new RuntimeException("not implemented");
+	}
+
+	@Override
+	public Total newTotal(Total source) {
+		throw new RuntimeException("not implemented");
+	}
+
+	@Override
+	public Total getTotal(Boolean asObject) {
+		throw new RuntimeException("not implemented");
+	}
+
+	@Override
+	public void setTotal(Total total) {
+		throw new RuntimeException("not implemented");
+	}
+
+	@Override
+	public Map<String, OrderItem> getItems(Boolean asObject) {
 		throw new RuntimeException("not implemented");
 	}
 
