@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.bakerbeach.market.core.api.model.OrderItem;
 import com.bakerbeach.market.core.api.model.TaxCode;
+import com.bakerbeach.market.order.api.model.OrderItem;
 
 public class XOrderItemImpl implements OrderItem {
 	protected String id;

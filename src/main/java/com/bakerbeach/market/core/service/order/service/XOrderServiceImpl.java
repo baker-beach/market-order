@@ -18,14 +18,14 @@ import com.bakerbeach.market.core.api.model.Cart;
 import com.bakerbeach.market.core.api.model.CartItem;
 import com.bakerbeach.market.core.api.model.Coupon;
 import com.bakerbeach.market.core.api.model.Customer;
-import com.bakerbeach.market.core.api.model.Order;
-import com.bakerbeach.market.core.api.model.OrderItem;
 import com.bakerbeach.market.core.api.model.ShopContext;
 import com.bakerbeach.market.core.service.order.dao.OrderDao;
 import com.bakerbeach.market.core.service.order.dao.OrderDaoException;
 import com.bakerbeach.market.inventory.api.model.TransactionData;
 import com.bakerbeach.market.inventory.api.service.InventoryService;
 import com.bakerbeach.market.inventory.api.service.InventoryServiceException;
+import com.bakerbeach.market.order.api.model.Order;
+import com.bakerbeach.market.order.api.model.OrderItem;
 import com.bakerbeach.market.order.api.model.OrderList;
 import com.bakerbeach.market.order.api.service.OrderService;
 import com.bakerbeach.market.order.api.service.OrderServiceException;
@@ -290,6 +290,17 @@ public class XOrderServiceImpl implements OrderService {
 	public Order findOrderById(String orderId) throws OrderServiceException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public OrderList findOrderByStatusAndShopCode(String status, String shopCode, String sort, Integer limit,
+			Integer offset) throws OrderServiceException {
+		// TODO Auto-generated method stub
+		try {
+			return orderDaos.get(shopCode).findByStatusAndShop(status, shopCode, sort, limit, offset);
+		} catch (OrderDaoException e) {
+			throw new OrderServiceException();
+		}
 	}
 
 }

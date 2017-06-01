@@ -6,8 +6,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.bakerbeach.market.core.api.model.OrderItem;
 import com.bakerbeach.market.core.api.model.TaxCode;
+import com.bakerbeach.market.order.api.model.OrderItem;
 
 public class SimpleOrderItem extends HashMap<String, Object> implements OrderItem {
 	private static final long serialVersionUID = 1L;

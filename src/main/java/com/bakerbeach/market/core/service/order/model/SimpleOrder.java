@@ -8,9 +8,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.bakerbeach.market.core.api.model.Address;
-import com.bakerbeach.market.core.api.model.Order;
-import com.bakerbeach.market.core.api.model.OrderItem;
 import com.bakerbeach.market.core.api.model.Total;
+import com.bakerbeach.market.order.api.model.Invoice;
+import com.bakerbeach.market.order.api.model.Order;
+import com.bakerbeach.market.order.api.model.OrderItem;
 
 public class SimpleOrder extends HashMap<String, Object> implements Order {
 
@@ -284,6 +285,12 @@ public class SimpleOrder extends HashMap<String, Object> implements Order {
 	@Override
 	public Map<String, OrderItem> getItems(Boolean asObject) {
 		throw new RuntimeException("not implemented");
+	}
+
+	@Override
+	public List<Invoice> getInvoices() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

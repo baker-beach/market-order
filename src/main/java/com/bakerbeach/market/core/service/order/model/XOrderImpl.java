@@ -12,11 +12,12 @@ import org.apache.commons.collections4.MapUtils;
 import org.mongodb.morphia.annotations.Id;
 
 import com.bakerbeach.market.core.api.model.Address;
-import com.bakerbeach.market.core.api.model.Order;
-import com.bakerbeach.market.core.api.model.OrderItem;
 import com.bakerbeach.market.core.api.model.Total;
 import com.bakerbeach.market.core.api.model.Total.Line;
 import com.bakerbeach.market.core.service.order.model.XOrderTotalImpl.LineImpl;
+import com.bakerbeach.market.order.api.model.Invoice;
+import com.bakerbeach.market.order.api.model.Order;
+import com.bakerbeach.market.order.api.model.OrderItem;
 
 //@Entity(value = "order", noClassnameStored = false)
 public class XOrderImpl implements Order {
@@ -30,6 +31,7 @@ public class XOrderImpl implements Order {
 	protected Address billingAddress;
 	protected Map<String, OrderItem> items = new LinkedHashMap<>();
 	protected Map<String, Object> attributes = new HashMap<>();
+	protected List<Invoice> invoices;
 	protected String status;
 	protected String customerEmail;
 	protected Date updatedAt;
@@ -298,6 +300,10 @@ public class XOrderImpl implements Order {
 	@Override
 	public OrderItem newItem() {
 		return new XOrderItemImpl();
+	}
+	@Override
+	public List<Invoice> getInvoices() {
+		return invoices;
 	}
 
 }
