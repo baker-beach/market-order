@@ -12,6 +12,7 @@ import com.bakerbeach.market.core.api.model.Total;
 import com.bakerbeach.market.order.api.model.Invoice;
 import com.bakerbeach.market.order.api.model.Order;
 import com.bakerbeach.market.order.api.model.OrderItem;
+import com.bakerbeach.market.order.api.model.Package;
 
 public class SimpleOrder extends HashMap<String, Object> implements Order {
 
@@ -289,6 +290,12 @@ public class SimpleOrder extends HashMap<String, Object> implements Order {
 
 	@Override
 	public List<Invoice> getInvoices() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Package> getPackages() {
 		// TODO Auto-generated method stub
 		return null;
 	}

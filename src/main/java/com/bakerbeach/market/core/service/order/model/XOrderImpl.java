@@ -18,6 +18,7 @@ import com.bakerbeach.market.core.service.order.model.XOrderTotalImpl.LineImpl;
 import com.bakerbeach.market.order.api.model.Invoice;
 import com.bakerbeach.market.order.api.model.Order;
 import com.bakerbeach.market.order.api.model.OrderItem;
+import com.bakerbeach.market.order.api.model.Package;
 
 //@Entity(value = "order", noClassnameStored = false)
 public class XOrderImpl implements Order {
@@ -304,6 +305,11 @@ public class XOrderImpl implements Order {
 	@Override
 	public List<Invoice> getInvoices() {
 		return invoices;
+	}
+	@Override
+	public List<Package> getPackages() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
