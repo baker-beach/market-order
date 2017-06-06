@@ -3,11 +3,13 @@ package com.bakerbeach.market.core.service.order.model;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import com.bakerbeach.market.core.api.model.TaxCode;
 import com.bakerbeach.market.order.api.model.OrderItem;
+import com.bakerbeach.market.order.api.model.PacketItemInfo;
 
 public class SimpleOrderItem extends HashMap<String, Object> implements OrderItem {
 	private static final long serialVersionUID = 1L;
@@ -474,6 +476,11 @@ public class SimpleOrderItem extends HashMap<String, Object> implements OrderIte
 
 	@Override
 	public void putOption(String key, Option option) {
+		throw new RuntimeException("not implemented");
+	}
+
+	@Override
+	public List<PacketItemInfo> getPacketItemInfos() {
 		throw new RuntimeException("not implemented");
 	}
 

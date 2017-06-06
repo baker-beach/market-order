@@ -1,12 +1,15 @@
 package com.bakerbeach.market.core.service.order.model;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.bakerbeach.market.core.api.model.TaxCode;
 import com.bakerbeach.market.order.api.model.OrderItem;
+import com.bakerbeach.market.order.api.model.PacketItemInfo;
 
 public class XOrderItemImpl implements OrderItem {
 	protected String id;
@@ -31,6 +34,7 @@ public class XOrderItemImpl implements OrderItem {
 	protected Map<String, String> images = new HashMap<>();
 	protected Map<String, BigDecimal> unitPrices = new HashMap<>();
 	protected Map<String, BigDecimal> totalPrices = new HashMap<>();
+	protected List<PacketItemInfo> packetItemInfos = new ArrayList<>();
 
 	@Override
 	public Map<String, Object> getAllAttributes() {
@@ -510,6 +514,12 @@ public class XOrderItemImpl implements OrderItem {
 			return title.get(key);
 		}
 
+	}
+
+	@Override
+	public List<PacketItemInfo> getPacketItemInfos() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }
