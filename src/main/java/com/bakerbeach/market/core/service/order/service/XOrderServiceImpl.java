@@ -302,5 +302,14 @@ public class XOrderServiceImpl implements OrderService {
 			throw new OrderServiceException();
 		}
 	}
+	
+	@Override
+	public void saveOrUpdate(Order order) throws OrderServiceException{
+		try {
+			orderDaos.get(order.getShopCode()).saveOrUpdateOrder(order);
+		} catch (OrderDaoException e) {
+			throw new OrderServiceException();
+		}
+	}
 
 }

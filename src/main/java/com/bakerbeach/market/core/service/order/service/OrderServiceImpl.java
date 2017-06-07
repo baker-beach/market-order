@@ -306,4 +306,10 @@ public class OrderServiceImpl implements OrderService {
 		throw new RuntimeException("not implemented");
 	}
 
+	@Override
+	public void saveOrUpdate(Order order) throws OrderServiceException {
+		throw new RuntimeException("not implemented");
+		
+	}
+
 }
