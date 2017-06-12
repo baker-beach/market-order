@@ -3,7 +3,6 @@ package com.bakerbeach.market.core.service.order.model;
 import java.math.BigDecimal;
 
 import com.bakerbeach.market.core.api.model.TaxCode;
-import com.bakerbeach.market.core.api.model.Total;
 import com.bakerbeach.market.order.api.model.InvoiceItem;
 
 public class InvoiceItemImpl implements InvoiceItem {
@@ -13,7 +12,8 @@ public class InvoiceItemImpl implements InvoiceItem {
 	private BigDecimal quantity;
 	private TaxCode taxCode;
 	private BigDecimal taxPercent;
-	private Total total;
+	private BigDecimal total;
+	private BigDecimal unitPrice;
 
 	public String getGtin() {
 		return gtin;
@@ -55,12 +55,20 @@ public class InvoiceItemImpl implements InvoiceItem {
 		this.taxPercent = taxPercent;
 	}
 
-	public Total getTotal() {
+	public BigDecimal getTotal() {
 		return total;
 	}
 
-	public void setTotal(Total total) {
+	public void setTotal(BigDecimal total) {
 		this.total = total;
+	}
+
+	public BigDecimal getUnitPrice() {
+		return unitPrice;
+	}
+
+	public void setUnitPrice(BigDecimal unitPrice) {
+		this.unitPrice = unitPrice;
 	}
 
 }

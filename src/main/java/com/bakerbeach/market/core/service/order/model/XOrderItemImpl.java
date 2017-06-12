@@ -518,8 +518,7 @@ public class XOrderItemImpl implements OrderItem {
 
 	@Override
 	public List<PacketItemInfo> getPacketItemInfos() {
-		// TODO Auto-generated method stub
-		return null;
+		return packetItemInfos;
 	}
 	
 }
