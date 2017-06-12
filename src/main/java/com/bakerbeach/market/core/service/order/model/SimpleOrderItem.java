@@ -170,20 +170,20 @@ public class SimpleOrderItem extends HashMap<String,Object> implements OrderItem
 		put("tax_percent",taxPercent);
 	}
 
-	@Override
-	public boolean isVisible() {
-		return (Boolean)get("visible");
-	}
-
-	@Override
-	public boolean isVolatile() {
-		return (Boolean)get("volatile");
-	}
-
-	@Override
-	public boolean isImmutable() {
-		return (Boolean)get("immutable");
-	}
+//	@Override
+//	public Boolean isVisible() {
+//		return (Boolean)get("visible");
+//	}
+//
+//	@Override
+//	public Boolean isVolatile() {
+//		return (Boolean)get("volatile");
+//	}
+//
+//	@Override
+//	public Boolean isImmutable() {
+//		return (Boolean)get("immutable");
+//	}
 	
 	public void setVisible(Boolean visible) {
 		put("visible",visible);
@@ -303,6 +303,219 @@ public class SimpleOrderItem extends HashMap<String,Object> implements OrderItem
 		public void setTitle3(String title3) {
 			this.title3 = title3;
 		}
+
+		@Override
+		public Map<String, BigDecimal> getUnitPrices() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public void setUnitPrices(Map<String, BigDecimal> unitPrices) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public Map<String, String> getTitle() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public void setTitle(Map<String, String> title) {
+			// TODO Auto-generated method stub
+			
+		}
+	}
+
+	@Override
+	public String getCode() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setCode(String code) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setName(String name) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Map<String, String> getTitle() {
+		Map<String, String> map = new HashMap<>();
+		map.put("title_1", getTitle1());
+		map.put("title_2", getTitle2());
+		map.put("title_3", getTitle3());
+
+		return map;
+	}
+
+	@Override
+	public String getTitle(String key) {
+		return getTitle().get(key);
+	}
+
+	@Override
+	public void setTitle(Map<String, String> title) {
+		setTitle1(title.get("title1"));
+		setTitle2(title.get("title2"));
+		setTitle3(title.get("title3"));
+	}
+
+	@Override
+	public Map<String, String> getImages() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getImage(String key) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setImages(Map<String, String> images) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Map<String, BigDecimal> getUnitPrices() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public BigDecimal getUnitPrice(String key) {
+		if ("std".equals(key)) {
+			return getUnitPrice();
+		}
+		
+		return null;
+	}
+
+	@Override
+	public void setUnitPrices(Map<String, BigDecimal> unitPrices) {
+		setUnitPrice(unitPrices.get("std"));
+	}
+
+	@Override
+	public void setUnitPrice(String key, BigDecimal value) {
+		if ("std".equals(key)) {
+			setUnitPrice(value);
+		}
+	}
+
+	@Override
+	public void addUnitPrices(Map<String, BigDecimal> unitPrices) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Map<String, BigDecimal> getTotalPrices() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public BigDecimal getTotalPrice(String key) {
+		if ("std".equals(key)) {
+			return getTotalPrice();
+		}
+
+		return null;
+	}
+
+	@Override
+	public void setTotalPrices(Map<String, BigDecimal> totalPrices) {
+		setTotalPrice(totalPrices.get("std"));
+	}
+
+	@Override
+	public Boolean isVisible() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setIsVisible(Boolean isVisible) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Boolean isVolatile() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setIsVolatile(Boolean isVolatile) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Boolean isImmutable() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setIsImmutable(Boolean isImmutable) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Map<String, Object> getAllAttributes() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<String, OrderItemOption> getOptions() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<String, Option> getAllOptions() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setOptions(Map<String, Option> options) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void putOption(String key, Option option) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Option newOption(String code) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

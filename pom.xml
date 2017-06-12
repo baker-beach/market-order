@@ -10,7 +10,7 @@
     <artifactId>market-order</artifactId>
     <name>market-order</name>
     <packaging>jar</packaging>
-    <version>2.1.4</version>
+    <version>2.1.5</version>
     <properties>
     </properties>
     <dependencies>

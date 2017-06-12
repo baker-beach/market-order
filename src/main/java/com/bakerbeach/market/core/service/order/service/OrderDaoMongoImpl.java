@@ -61,7 +61,7 @@ public class OrderDaoMongoImpl implements OrderDao {
 				orderList.add(OrderMongoConverter.decode(cur.next()));
 			}
 
-			orderList.setCount(orderList.size());
+			orderList.setCount(new Long(orderList.size()));
 			return orderList;
 		} catch (Exception e) {
 			throw new OrderDaoException();

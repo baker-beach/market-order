@@ -162,7 +162,13 @@ public class OrderServiceImpl implements OrderService {
 			throw new OrderServiceException();
 		}
 	}
-
+	
+	@Override
+	public Order findOrderById(String shopCode, String orderId) throws OrderServiceException {
+		log.warn("unsupported parameter shopCode");
+		return findOrderById(orderId);
+	}
+	
 	@Override
 	public OrderList findOrderByCustomerIdAndShopCode(String customerId, String shopCode) throws OrderServiceException {
 		try {
@@ -173,8 +179,9 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public OrderList findOrderByCustomerIdAndShopCode(String customerId, String shopCode, Integer limit, Integer offset) throws OrderServiceException {
+	public OrderList findOrderByCustomerIdAndShopCode(String customerId, String shopCode, String sort, Integer limit, Integer offset) throws OrderServiceException {
 		try {
+			// TODO: implement order by ---
 			return orderDao.findByCustomerId(customerId, shopCode, null, limit, offset);
 		} catch (OrderDaoException e) {
 			throw new OrderServiceException();
@@ -289,6 +296,13 @@ public class OrderServiceImpl implements OrderService {
 	 */
 	public void setInventoryService(InventoryService inventoryService) {
 		this.inventoryService = inventoryService;
+	}
+
+
+	@Override
+	public Order cancelOrder(String shopCode, String orderId) throws OrderServiceException {
+		log.warn("unsupported parameter shopCode");
+		return cancelOrder(orderId);	
 	}
 
 }

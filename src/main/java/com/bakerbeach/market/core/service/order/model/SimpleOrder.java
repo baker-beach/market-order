@@ -5,10 +5,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.bakerbeach.market.core.api.model.Address;
 import com.bakerbeach.market.core.api.model.Order;
 import com.bakerbeach.market.core.api.model.OrderItem;
+import com.bakerbeach.market.core.api.model.TaxCode;
+import com.bakerbeach.market.core.api.model.Total;
+import com.bakerbeach.market.core.api.model.Total.Line;
 
 public class SimpleOrder extends HashMap<String, Object> implements Order {
 
@@ -192,6 +196,126 @@ public class SimpleOrder extends HashMap<String, Object> implements Order {
 
 	public void setPaymentTransactionId(String paymentTransactionId) {
 		put(PAYMENT_TRANSACTION_ID, paymentTransactionId);
+	}
+
+	@Override
+	public String getCurrencyCode() {
+		return getCurrency();
+	}
+
+	@Override
+	public void setCurrencyCode(String currencyCode) {
+		setCurrency(currencyCode);
+	}
+
+	@Override
+	public Total getTotal(Boolean asObject) {
+		TotalImpl total = new TotalImpl();
+		total.setGross(getTotal());
+		return total;
+	}
+
+	@Override
+	public void setTotal(Total total) {		
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public Address newAddress(Address source) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<String, OrderItem> getItems(Boolean asObject) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public OrderItem getItem(String key) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void addItem(Object newOrderItem) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void addItem(OrderItem item) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Map<String, Object> getAllAttributes() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void addAttributes(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getStatus() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public OrderItem newItem() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Total newTotal(Total source) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	private static class TotalImpl implements Total {
+		protected BigDecimal gross = BigDecimal.ZERO;
+		protected Map<TaxCode, Line> lines = new HashMap<TaxCode, Line>(2);
+
+		@Override
+		public String getQualifier() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public BigDecimal getGross() {
+			return gross;
+		}
+		
+		public void setGross(BigDecimal gross) {
+			this.gross = gross;
+		}
+
+		@Override
+		public BigDecimal getNet() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public BigDecimal getQuantity() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public Map<TaxCode, Line> getLines() {
+			return lines;
+		}
+		
 	}
 
 }

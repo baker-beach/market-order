@@ -8,15 +8,15 @@ import com.bakerbeach.market.order.api.model.OrderList;
 
 @SuppressWarnings("serial")
 public class OrderListImpl extends ArrayList<Order> implements OrderList {
-    private Integer count;
+    private Long count;
 
     @Override
-    public Integer getCount() {
+    public Long getCount() {
         return count;
     }
 
     @Override
-    public void setCount(Integer count) {
+    public void setCount(Long count) {
         this.count = count;
     }
     
