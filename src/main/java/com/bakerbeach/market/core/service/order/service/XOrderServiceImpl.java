@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.camel.ProducerTemplate;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +75,7 @@ public class XOrderServiceImpl implements OrderService {
 				throw new OrderServiceException(ise.getMessages());
 			}
 
-			if (!cart.getCoupons().isEmpty()) {
+			if (CollectionUtils.isNotEmpty(cart.getCoupons())) {
 				try {
 					Coupon coupon = cart.getCoupons().get(0);
 					cartService.setIndividualUse(coupon, customer.getId(), order.getId(), cart,
