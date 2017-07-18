@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.bakerbeach.market.core.api.model.ProductType;
 import com.bakerbeach.market.core.api.model.TaxCode;
 import com.bakerbeach.market.order.api.model.OrderItem;
 import com.bakerbeach.market.order.api.model.PacketItemInfo;
@@ -16,6 +17,16 @@ public class SimpleOrderItem extends HashMap<String, Object> implements OrderIte
 
 	private Map<String, OrderItemComponent> components = new TreeMap<String, OrderItemComponent>();
 	protected Map<String, OrderItemOption> options = new LinkedHashMap<>();
+	
+	protected ProductType type = ProductType.SINGLE;
+	
+	public ProductType getType() {
+		return type;
+	}
+
+	public void setType(ProductType type) {
+		this.type = type;
+	}
 
 	@Override
 	public HashMap<String, Object> getAttributes() {

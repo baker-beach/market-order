@@ -238,6 +238,7 @@ public class XOrderServiceImpl implements OrderService {
 		oi.setQualifier(ci.getQualifier());
 		oi.setTitle(ci.getTitle());
 		oi.setImages(ci.getImages());
+		oi.setType(ci.getType());
 		
 		ci.getOptions().forEach((key, cio) -> {
 			OrderItem.Option option = newOption(cio, oi);

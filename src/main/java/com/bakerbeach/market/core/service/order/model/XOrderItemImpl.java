@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.bakerbeach.market.core.api.model.ProductType;
 import com.bakerbeach.market.core.api.model.TaxCode;
 import com.bakerbeach.market.order.api.model.OrderItem;
 import com.bakerbeach.market.order.api.model.PacketItemInfo;
@@ -35,6 +36,15 @@ public class XOrderItemImpl implements OrderItem {
 	protected Map<String, BigDecimal> unitPrices = new HashMap<>();
 	protected Map<String, BigDecimal> totalPrices = new HashMap<>();
 	protected List<PacketItemInfo> packetItemInfos = new ArrayList<>();
+	protected ProductType type = ProductType.SINGLE;
+	
+	public ProductType getType() {
+		return type;
+	}
+
+	public void setType(ProductType type) {
+		this.type = type;
+	}
 
 	@Override
 	public Map<String, Object> getAllAttributes() {
