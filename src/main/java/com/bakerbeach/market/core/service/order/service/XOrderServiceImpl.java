@@ -66,7 +66,7 @@ public class XOrderServiceImpl implements OrderService {
 			try {
 				orderDaos.get(shopCode).saveOrUpdateOrder(order);
 			} catch (OrderDaoException e1) {
-				throw new OrderServiceException(new MessageImpl(MessageImpl.TYPE_ERROR, "internal.error"));
+				throw new OrderServiceException(new MessageImpl("foo",MessageImpl.TYPE_ERROR,"internal.error", null, null));
 			}
 
 			try {
@@ -100,7 +100,7 @@ public class XOrderServiceImpl implements OrderService {
 			try {
 				orderDaos.get(shopCode).saveOrUpdateOrder(order);
 			} catch (OrderDaoException e1) {
-				throw new OrderServiceException(new MessageImpl(MessageImpl.TYPE_ERROR, "internal.error"));
+				throw new OrderServiceException(new MessageImpl("foo",MessageImpl.TYPE_ERROR,"internal.error", null, null));
 			}
 
 			try {

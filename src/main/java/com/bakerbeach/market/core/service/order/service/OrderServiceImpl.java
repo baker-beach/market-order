@@ -1,5 +1,6 @@
 package com.bakerbeach.market.core.service.order.service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -69,7 +70,7 @@ public class OrderServiceImpl implements OrderService {
 			try {
 				orderDao.saveOrUpdateOrder(order);
 			} catch (OrderDaoException e1) {
-				throw new OrderServiceException(new MessageImpl(MessageImpl.TYPE_ERROR,"internal.error"));
+				throw new OrderServiceException(new MessageImpl("foo",MessageImpl.TYPE_ERROR,"internal.error", null, null));
 			}
 
 			try {
@@ -99,7 +100,7 @@ public class OrderServiceImpl implements OrderService {
 			try {
 				orderDao.saveOrUpdateOrder(order);
 			} catch (OrderDaoException e1) {
-				throw new OrderServiceException(new MessageImpl(MessageImpl.TYPE_ERROR,"internal.error"));
+				throw new OrderServiceException(new MessageImpl("foo",MessageImpl.TYPE_ERROR,"internal.error",null, null));
 			}
 			
 			try {
