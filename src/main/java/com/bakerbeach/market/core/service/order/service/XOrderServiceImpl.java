@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import com.bakerbeach.market.cart.api.service.CartRuleAware;
 import com.bakerbeach.market.cart.api.service.CartService;
 import com.bakerbeach.market.cart.api.service.CartServiceException;
 import com.bakerbeach.market.commons.MessageImpl;
@@ -61,8 +62,9 @@ public class XOrderServiceImpl implements OrderService {
 
 		String shopCode = shopContext.getShopCode();
 
+		Order order = null;
 		try {
-			Order order = newOrder(cart, customer, shopContext);
+			order = newOrder(cart, customer, shopContext);
 			try {
 				orderDaos.get(shopCode).saveOrUpdateOrder(order);
 			} catch (OrderDaoException e1) {
@@ -75,17 +77,12 @@ public class XOrderServiceImpl implements OrderService {
 				throw new OrderServiceException(ise.getMessages());
 			}
 
-			if (CollectionUtils.isNotEmpty(cart.getCoupons())) {
-				try {
-					Coupon coupon = cart.getCoupons().get(0);
-					cartService.setIndividualUse(coupon, customer.getId(), order.getId(), cart,
-							shopContext.getShopCode());
-					coupon.getCode();
-				} catch (CartServiceException cse) {
-					cart.getCoupons().clear();
-
-					throw new OrderServiceException(cse.getMessages());
+			try {
+				if (cart instanceof CartRuleAware) {
+					cartService.setRuleUse(null, cart, customer, order.getId());
 				}
+			} catch (CartServiceException cse) {
+				throw new OrderServiceException(cse.getMessages());
 			}
 
 			try {
@@ -118,6 +115,13 @@ public class XOrderServiceImpl implements OrderService {
 			} catch (InventoryServiceException ise) {
 				log.error(ExceptionUtils.getStackTrace(ise));
 			}
+			
+			try {
+				cartService.unsetRuleUse(null, cart, customer, order.getId());
+			} catch (Exception ee) {
+				log.error(ExceptionUtils.getStackTrace(ee));
+			}
+
 			throw e;
 		}
 	}
