@@ -1,11 +1,11 @@
 package com.bakerbeach.market.core.service.order.service;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.camel.ProducerTemplate;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,10 +15,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import com.bakerbeach.market.cart.api.service.CartRuleAware;
 import com.bakerbeach.market.cart.api.service.CartService;
 import com.bakerbeach.market.cart.api.service.CartServiceException;
+import com.bakerbeach.market.commons.Message;
 import com.bakerbeach.market.commons.MessageImpl;
 import com.bakerbeach.market.core.api.model.Cart;
 import com.bakerbeach.market.core.api.model.CartItem;
-import com.bakerbeach.market.core.api.model.Coupon;
 import com.bakerbeach.market.core.api.model.Customer;
 import com.bakerbeach.market.core.api.model.ShopContext;
 import com.bakerbeach.market.core.service.order.dao.OrderDao;
@@ -68,7 +68,8 @@ public class XOrderServiceImpl implements OrderService {
 			try {
 				orderDaos.get(shopCode).saveOrUpdateOrder(order);
 			} catch (OrderDaoException e1) {
-				throw new OrderServiceException(new MessageImpl("foo",MessageImpl.TYPE_ERROR,"internal.error", null, null));
+				throw new OrderServiceException(new MessageImpl("order", MessageImpl.TYPE_ERROR, "internal.error",
+						Arrays.asList(Message.TAG_BOX), Arrays.asList()));
 			}
 
 			try {
@@ -82,12 +83,14 @@ public class XOrderServiceImpl implements OrderService {
 					cartService.setRuleUse(null, cart, customer, order.getId());
 				}
 			} catch (CartServiceException cse) {
-				throw new OrderServiceException(cse.getMessages());
+				cartService.clearCodeRules(cart);
+				throw new OrderServiceException(new MessageImpl("order", Message.TYPE_ERROR, "set-rule-use-failed",
+						Arrays.asList(Message.TAG_BOX), Arrays.asList()));
 			}
 
 			try {
 				paymentService.doOrder(order);
-				
+
 				// TODO: get order status from payment serviec
 				order.setStatus(Order.STATUS_SUBMIT);
 			} catch (PaymentServiceException pse) {
@@ -97,7 +100,8 @@ public class XOrderServiceImpl implements OrderService {
 			try {
 				orderDaos.get(shopCode).saveOrUpdateOrder(order);
 			} catch (OrderDaoException e1) {
-				throw new OrderServiceException(new MessageImpl("foo",MessageImpl.TYPE_ERROR,"internal.error", null, null));
+				throw new OrderServiceException(new MessageImpl("order", MessageImpl.TYPE_ERROR, "internal.error",
+						Arrays.asList(Message.TAG_BOX), Arrays.asList()));
 			}
 
 			try {
@@ -105,7 +109,7 @@ public class XOrderServiceImpl implements OrderService {
 			} catch (InventoryServiceException ise) {
 				log.error(ExceptionUtils.getStackTrace(ise));
 			}
-			
+
 			sendOrderMessage(order);
 
 			return order;
@@ -115,7 +119,7 @@ public class XOrderServiceImpl implements OrderService {
 			} catch (InventoryServiceException ise) {
 				log.error(ExceptionUtils.getStackTrace(ise));
 			}
-			
+
 			try {
 				cartService.unsetRuleUse(null, cart, customer, order.getId());
 			} catch (Exception ee) {
@@ -162,7 +166,7 @@ public class XOrderServiceImpl implements OrderService {
 		try {
 			String key = shopContext.getOrderSequenceCode() + ORDER_ID_SEQUENCE_POSTFIX;
 			Long maxRandomOffset = shopContext.getOrderSequenceRandomOffset();
-			
+
 			return sequenceService.generateId(key, maxRandomOffset).toString();
 		} catch (SequenceServiceException e) {
 			throw new OrderServiceException();
@@ -224,10 +228,10 @@ public class XOrderServiceImpl implements OrderService {
 		}
 
 	}
-	
+
 	private OrderItem newOrderItem(CartItem ci, Order order) throws OrderServiceException {
 		OrderItem oi = order.newItem();
-		
+
 		oi.setCode(ci.getCode());
 		oi.setGtin(ci.getGtin());
 		oi.setBrand(ci.getBrand());
@@ -243,7 +247,7 @@ public class XOrderServiceImpl implements OrderService {
 		oi.setTitle(ci.getTitle());
 		oi.setImages(ci.getImages());
 		oi.setType(ci.getType());
-		
+
 		ci.getOptions().forEach((key, cio) -> {
 			OrderItem.Option option = newOption(cio, oi);
 			oi.putOption(option.getCode(), option);
@@ -251,7 +255,7 @@ public class XOrderServiceImpl implements OrderService {
 
 		return oi;
 	}
-	
+
 	private OrderItem.Option newOption(CartItem.Option cio, OrderItem oi) {
 		OrderItem.Option option = oi.newOption(cio.getCode());
 
@@ -260,8 +264,8 @@ public class XOrderServiceImpl implements OrderService {
 		option.setTag(cio.getTag());
 		option.setUnitPrices(cio.getUnitPrices());
 		option.setTitle(cio.getTitle());
-				
-		return option;		
+
+		return option;
 	}
 
 	public SequenceService getSequenceService() {
@@ -308,9 +312,9 @@ public class XOrderServiceImpl implements OrderService {
 			throw new OrderServiceException();
 		}
 	}
-	
+
 	@Override
-	public void saveOrUpdate(Order order) throws OrderServiceException{
+	public void saveOrUpdate(Order order) throws OrderServiceException {
 		try {
 			orderDaos.get(order.getShopCode()).saveOrUpdateOrder(order);
 		} catch (OrderDaoException e) {

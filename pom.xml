@@ -10,14 +10,14 @@
 	<artifactId>market-order</artifactId>
 	<name>market-order</name>
 	<packaging>jar</packaging>
-	<version>3.0.5</version>
+	<version>3.0.6</version>
 	<properties>
 	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>com.bakerbeach.market</groupId>
 			<artifactId>market-order-api</artifactId>
-			<version>3.0.3</version>
+			<version>[3.0.4]</version>
 		</dependency>
 		<dependency>
 			<groupId>com.bakerbeach.market</groupId>
