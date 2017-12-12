@@ -312,4 +312,10 @@ public class OrderServiceImpl implements OrderService {
 		
 	}
 
+	@Override
+	public OrderList findOrdersByFilters(String shopCode, Map<String, Object> filters) throws OrderServiceException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

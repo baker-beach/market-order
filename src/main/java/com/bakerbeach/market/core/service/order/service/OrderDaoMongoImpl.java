@@ -1,5 +1,7 @@
 package com.bakerbeach.market.core.service.order.service;
 
+import java.util.Map;
+
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import com.bakerbeach.market.core.service.order.dao.OrderDao;
@@ -103,6 +105,12 @@ public class OrderDaoMongoImpl implements OrderDao {
 	@Override
 	public OrderList findByStatusAndShop(String status, String shopCode, String orderBy, Integer limit, Integer offset)
 			throws OrderDaoException {
+		return null;
+	}
+
+	@Override
+	public OrderList findByFilters(Map<String, Object> filters, String orderBy, Integer limit, Integer offset) throws OrderDaoException {
+		// TODO Auto-generated method stub
 		return null;
 	}
 

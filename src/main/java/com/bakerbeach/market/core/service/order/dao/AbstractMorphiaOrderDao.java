@@ -1,5 +1,7 @@
 package com.bakerbeach.market.core.service.order.dao;
 
+import java.util.Map;
+
 import org.mongodb.morphia.AdvancedDatastore;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
@@ -56,6 +58,37 @@ public abstract class AbstractMorphiaOrderDao<O extends Order> implements OrderD
 			query.order(orderBy);
 		} else {
 			query.order("-order_id");
+		}
+
+		if (limit != null)
+			query.limit(limit);
+
+		if (offset != null)
+			query.offset(offset);	
+			
+		OrderListImpl orderList = new OrderListImpl();
+		query.forEach(order -> {
+			orderList.add(order);
+		});
+
+		orderList.setCount(query.countAll());
+
+		return orderList;
+	}
+	
+	@Override
+	public OrderList findByFilters(Map<String,Object> filters, String orderBy, Integer limit,
+			Integer offset) throws OrderDaoException {
+
+		Query<O> query = ((AdvancedDatastore) datastore).createQuery(orderCollectionName, orderClass);
+		for(String filterKey : filters.keySet()) {
+			query.filter(filterKey, filters.get(filterKey));
+		}
+
+		if (orderBy != null) {
+			query.order(orderBy);
+		} else {
+			query.order("-_id");
 		}
 
 		if (limit != null)

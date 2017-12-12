@@ -301,6 +301,15 @@ public class XOrderServiceImpl implements OrderService {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	@Override
+	public OrderList findOrdersByFilters(String shopCode, Map<String,Object> filters) throws OrderServiceException{
+		try {
+			return orderDaos.get(shopCode).findByFilters(filters, null, null, null);
+		} catch (OrderDaoException e) {
+			throw new OrderServiceException();
+		}
+	}
 
 	@Override
 	public OrderList findOrderByStatusAndShopCode(String status, String shopCode, String sort, Integer limit,

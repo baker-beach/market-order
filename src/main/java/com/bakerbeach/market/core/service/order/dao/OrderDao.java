@@ -1,5 +1,7 @@
 package com.bakerbeach.market.core.service.order.dao;
 
+import java.util.Map;
+
 import com.bakerbeach.market.order.api.model.Order;
 import com.bakerbeach.market.order.api.model.OrderList;
 import com.mongodb.DBObject;
@@ -20,5 +22,7 @@ public interface OrderDao {
 	Order newInstance() throws InstantiationException, IllegalAccessException;
 
 	OrderList findByStatusAndShop(String status, String shopCode, String orderBy, Integer limit, Integer offset) throws OrderDaoException;
+	
+	OrderList findByFilters(Map<String,Object> filters, String orderBy, Integer limit, Integer offset) throws OrderDaoException;
 
 }
