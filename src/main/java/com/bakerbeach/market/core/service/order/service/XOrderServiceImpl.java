@@ -1,5 +1,6 @@
 package com.bakerbeach.market.core.service.order.service;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -68,8 +69,7 @@ public class XOrderServiceImpl implements OrderService {
 			try {
 				orderDaos.get(shopCode).saveOrUpdateOrder(order);
 			} catch (OrderDaoException e1) {
-				throw new OrderServiceException(new MessageImpl("order", MessageImpl.TYPE_ERROR, "internal.error",
-						Arrays.asList(Message.TAG_BOX), Arrays.asList()));
+				throw new OrderServiceException(new MessageImpl("order", MessageImpl.TYPE_ERROR, "internal.error", Arrays.asList(Message.TAG_BOX), Arrays.asList()));
 			}
 
 			try {
@@ -84,12 +84,13 @@ public class XOrderServiceImpl implements OrderService {
 				}
 			} catch (CartServiceException cse) {
 				cartService.clearCodeRules(cart);
-				throw new OrderServiceException(new MessageImpl("order", Message.TYPE_ERROR, "set-rule-use-failed",
-						Arrays.asList(Message.TAG_BOX), Arrays.asList()));
+				throw new OrderServiceException(new MessageImpl("order", Message.TYPE_ERROR, "set-rule-use-failed", Arrays.asList(Message.TAG_BOX), Arrays.asList()));
 			}
 
 			try {
-				paymentService.doOrder(order);
+
+				if (order.getTotal(true).getGross().compareTo(BigDecimal.ZERO) == 1)
+					paymentService.doOrder(order);
 
 				// TODO: get order status from payment serviec
 				order.setStatus(Order.STATUS_SUBMIT);
@@ -100,8 +101,7 @@ public class XOrderServiceImpl implements OrderService {
 			try {
 				orderDaos.get(shopCode).saveOrUpdateOrder(order);
 			} catch (OrderDaoException e1) {
-				throw new OrderServiceException(new MessageImpl("order", MessageImpl.TYPE_ERROR, "internal.error",
-						Arrays.asList(Message.TAG_BOX), Arrays.asList()));
+				throw new OrderServiceException(new MessageImpl("order", MessageImpl.TYPE_ERROR, "internal.error", Arrays.asList(Message.TAG_BOX), Arrays.asList()));
 			}
 
 			try {
@@ -188,8 +188,7 @@ public class XOrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public OrderList findOrderByCustomerIdAndShopCode(String customerId, String shopCode, String sort, Integer limit,
-			Integer offset) throws OrderServiceException {
+	public OrderList findOrderByCustomerIdAndShopCode(String customerId, String shopCode, String sort, Integer limit, Integer offset) throws OrderServiceException {
 		try {
 			return orderDaos.get(shopCode).findByCustomerIdAndShop(customerId, shopCode, "-id", limit, offset);
 		} catch (OrderDaoException e) {
@@ -211,8 +210,7 @@ public class XOrderServiceImpl implements OrderService {
 			order.setBillingAddress(order.newAddress(shopContext.getBillingAddress()));
 			order.setShippingAddress(order.newAddress(shopContext.getShippingAddress()));
 			order.setStatus(Order.STATUS_TMP);
-			order.addAttributes(
-					(HashMap<String, Object>) shopContext.getSessionData().get(ADDITIONAL_ORDER_INFORMATIONS));
+			order.addAttributes((HashMap<String, Object>) shopContext.getSessionData().get(ADDITIONAL_ORDER_INFORMATIONS));
 			order.setCreatedAt(new Date());
 			cart.getItems().forEach((k, ci) -> {
 				try {
@@ -301,9 +299,9 @@ public class XOrderServiceImpl implements OrderService {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	@Override
-	public OrderList findOrdersByFilters(String shopCode, Map<String,Object> filters) throws OrderServiceException{
+	public OrderList findOrdersByFilters(String shopCode, Map<String, Object> filters) throws OrderServiceException {
 		try {
 			return orderDaos.get(shopCode).findByFilters(filters, null, null, null);
 		} catch (OrderDaoException e) {
@@ -312,8 +310,7 @@ public class XOrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public OrderList findOrderByStatusAndShopCode(String status, String shopCode, String sort, Integer limit,
-			Integer offset) throws OrderServiceException {
+	public OrderList findOrderByStatusAndShopCode(String status, String shopCode, String sort, Integer limit, Integer offset) throws OrderServiceException {
 		// TODO Auto-generated method stub
 		try {
 			return orderDaos.get(shopCode).findByStatusAndShop(status, shopCode, sort, limit, offset);
