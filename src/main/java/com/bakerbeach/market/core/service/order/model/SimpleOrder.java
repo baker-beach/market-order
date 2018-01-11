@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.bakerbeach.market.core.api.model.Address;
-import com.bakerbeach.market.core.api.model.Order;
-import com.bakerbeach.market.core.api.model.OrderItem;
-import com.bakerbeach.market.core.api.model.TaxCode;
 import com.bakerbeach.market.core.api.model.Total;
-import com.bakerbeach.market.core.api.model.Total.Line;
+import com.bakerbeach.market.order.api.model.Invoice;
+import com.bakerbeach.market.order.api.model.Order;
+import com.bakerbeach.market.order.api.model.OrderItem;
+import com.bakerbeach.market.order.api.model.Packet;
 
 public class SimpleOrder extends HashMap<String, Object> implements Order {
 
@@ -136,6 +136,31 @@ public class SimpleOrder extends HashMap<String, Object> implements Order {
 		this.billingAddress = billingAddress;
 	}
 
+	@Override
+	public Address newAddress(Address source) {
+		OrderAddressImpl target = new OrderAddressImpl();
+
+		target.setPrefix(source.getPrefix());
+		target.setFirstName(source.getFirstName());
+		target.setLastName(source.getLastName());
+		target.setMiddleName(source.getMiddleName());
+		target.setSuffix(source.getSuffix());
+		target.setStreet1(source.getStreet1());
+		target.setStreet2(source.getStreet2());
+		target.setPostcode(source.getPostcode());
+		target.setCity(source.getCity());
+		target.setRegion(source.getRegion());
+		target.setCountryCode(source.getCountryCode());
+		target.setEmail(source.getEmail());
+		target.setTelephone(source.getTelephone());
+		target.setFax(source.getFax());
+		target.setCompany(source.getCompany());
+		target.setCreatedAt(source.getCreatedAt());
+		target.setUpdatedAt(source.getUpdatedAt());
+
+		return target;
+	}
+
 	/**
 	 * @return the items
 	 */
@@ -200,122 +225,77 @@ public class SimpleOrder extends HashMap<String, Object> implements Order {
 
 	@Override
 	public String getCurrencyCode() {
-		return getCurrency();
-	}
-
-	@Override
-	public void setCurrencyCode(String currencyCode) {
-		setCurrency(currencyCode);
-	}
-
-	@Override
-	public Total getTotal(Boolean asObject) {
-		TotalImpl total = new TotalImpl();
-		total.setGross(getTotal());
-		return total;
-	}
-
-	@Override
-	public void setTotal(Total total) {		
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public Address newAddress(Address source) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Map<String, OrderItem> getItems(Boolean asObject) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new RuntimeException("not implemented");
 	}
 
 	@Override
 	public OrderItem getItem(String key) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void addItem(Object newOrderItem) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void addItem(OrderItem item) {
-		// TODO Auto-generated method stub
-		
+		throw new RuntimeException("not implemented");
 	}
 
 	@Override
 	public Map<String, Object> getAllAttributes() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void addAttributes(Map<String, Object> map) {
-		// TODO Auto-generated method stub
-		
+		throw new RuntimeException("not implemented");
 	}
 
 	@Override
 	public String getStatus() {
-		// TODO Auto-generated method stub
-		return null;
+		throw new RuntimeException("not implemented");
+	}
+
+	@Override
+	public void setCurrencyCode(String currencyCode) {
+		throw new RuntimeException("not implemented");
+	}
+
+	@Override
+	public void addItem(Object newOrderItem) {
+		throw new RuntimeException("not implemented");
+	}
+
+	@Override
+	public void addAttributes(Map<String, Object> map) {
+		throw new RuntimeException("not implemented");
+	}
+
+	@Override
+	public void addItem(OrderItem item) {
+		throw new RuntimeException("not implemented");
 	}
 
 	@Override
 	public OrderItem newItem() {
-		// TODO Auto-generated method stub
-		return null;
+		throw new RuntimeException("not implemented");
 	}
 
 	@Override
 	public Total newTotal(Total source) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new RuntimeException("not implemented");
 	}
-	
-	private static class TotalImpl implements Total {
-		protected BigDecimal gross = BigDecimal.ZERO;
-		protected Map<TaxCode, Line> lines = new HashMap<TaxCode, Line>(2);
 
-		@Override
-		public String getQualifier() {
-			// TODO Auto-generated method stub
-			return null;
-		}
+	@Override
+	public Total getTotal(Boolean asObject) {
+		throw new RuntimeException("not implemented");
+	}
 
-		@Override
-		public BigDecimal getGross() {
-			return gross;
-		}
-		
-		public void setGross(BigDecimal gross) {
-			this.gross = gross;
-		}
+	@Override
+	public void setTotal(Total total) {
+		throw new RuntimeException("not implemented");
+	}
 
-		@Override
-		public BigDecimal getNet() {
-			// TODO Auto-generated method stub
-			return null;
-		}
+	@Override
+	public Map<String, OrderItem> getItems(Boolean asObject) {
+		throw new RuntimeException("not implemented");
+	}
 
-		@Override
-		public BigDecimal getQuantity() {
-			// TODO Auto-generated method stub
-			return null;
-		}
+	@Override
+	public List<Invoice> getInvoices() {
+		throw new RuntimeException("not implemented");
+	}
 
-		@Override
-		public Map<TaxCode, Line> getLines() {
-			return lines;
-		}
-		
+	@Override
+	public List<Packet> getPackets() {
+		throw new RuntimeException("not implemented");
 	}
 
 }

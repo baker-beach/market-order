@@ -3,7 +3,7 @@ package com.bakerbeach.market.core.service.order.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bakerbeach.market.core.api.model.Order;
+import com.bakerbeach.market.order.api.model.Order;
 import com.bakerbeach.market.order.api.model.OrderList;
 
 @SuppressWarnings("serial")

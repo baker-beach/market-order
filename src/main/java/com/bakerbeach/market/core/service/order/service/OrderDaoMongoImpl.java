@@ -1,10 +1,14 @@
 package com.bakerbeach.market.core.service.order.service;
 
+import java.util.Map;
+
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-import com.bakerbeach.market.core.api.model.Order;
+import com.bakerbeach.market.core.service.order.dao.OrderDao;
+import com.bakerbeach.market.core.service.order.dao.OrderDaoException;
 import com.bakerbeach.market.core.service.order.model.OrderListImpl;
 import com.bakerbeach.market.core.service.order.model.SimpleOrder;
+import com.bakerbeach.market.order.api.model.Order;
 import com.bakerbeach.market.order.api.model.OrderList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
@@ -37,7 +41,6 @@ public class OrderDaoMongoImpl implements OrderDao {
 
 	@Override
 	public OrderList findByCustomerId(String customerId, String shopCode, DBObject orderBy, Integer limit, Integer offset) throws OrderDaoException {
-
 		try {
 			OrderListImpl orderList = new OrderListImpl();
 			QueryBuilder qb = QueryBuilder.start();
@@ -60,13 +63,17 @@ public class OrderDaoMongoImpl implements OrderDao {
 			while (cur.hasNext()) {
 				orderList.add(OrderMongoConverter.decode(cur.next()));
 			}
-
-			orderList.setCount(new Long(orderList.size()));
+			orderList.setCount(new Long(cur.count()));
 			return orderList;
 		} catch (Exception e) {
 			throw new OrderDaoException();
 		}
-
+	}
+	
+	@Override
+	public OrderList findByCustomerIdAndShop(String customerId, String shopCode, String orderBy, Integer limit,
+			Integer offset) throws OrderDaoException {
+		throw new RuntimeException("not implemented");
 	}
 
 	public MongoTemplate getMongoShopTemplate() {
@@ -87,6 +94,23 @@ public class OrderDaoMongoImpl implements OrderDao {
 
 	public void setCollectionName(String collectionName) {
 		this.collectionName = collectionName;
+	}
+
+	@Override
+	public Order newInstance() throws InstantiationException, IllegalAccessException {
+		throw new RuntimeException("not implemented");
+	}
+
+	@Override
+	public OrderList findByStatusAndShop(String status, String shopCode, String orderBy, Integer limit, Integer offset)
+			throws OrderDaoException {
+		return null;
+	}
+
+	@Override
+	public OrderList findByFilters(Map<String, Object> filters, String orderBy, Integer limit, Integer offset) throws OrderDaoException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

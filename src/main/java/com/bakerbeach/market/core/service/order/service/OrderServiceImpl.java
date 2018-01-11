@@ -20,9 +20,9 @@ import com.bakerbeach.market.core.api.model.CartItem.CartItemComponent;
 import com.bakerbeach.market.core.api.model.CartItem.CartItemOption;
 import com.bakerbeach.market.core.api.model.Coupon;
 import com.bakerbeach.market.core.api.model.Customer;
-import com.bakerbeach.market.core.api.model.Order;
-import com.bakerbeach.market.core.api.model.OrderItem;
 import com.bakerbeach.market.core.api.model.ShopContext;
+import com.bakerbeach.market.core.service.order.dao.OrderDao;
+import com.bakerbeach.market.core.service.order.dao.OrderDaoException;
 import com.bakerbeach.market.core.service.order.model.SimpleOrder;
 import com.bakerbeach.market.core.service.order.model.SimpleOrderItem;
 import com.bakerbeach.market.core.service.order.model.SimpleOrderItem.SimpleOrderItemComponent;
@@ -30,6 +30,8 @@ import com.bakerbeach.market.core.service.order.model.SimpleOrderItem.SimpleOrde
 import com.bakerbeach.market.inventory.api.model.TransactionData;
 import com.bakerbeach.market.inventory.api.service.InventoryService;
 import com.bakerbeach.market.inventory.api.service.InventoryServiceException;
+import com.bakerbeach.market.order.api.model.Order;
+import com.bakerbeach.market.order.api.model.OrderItem;
 import com.bakerbeach.market.order.api.model.OrderList;
 import com.bakerbeach.market.order.api.service.OrderService;
 import com.bakerbeach.market.order.api.service.OrderServiceException;
@@ -67,7 +69,7 @@ public class OrderServiceImpl implements OrderService {
 			try {
 				orderDao.saveOrUpdateOrder(order);
 			} catch (OrderDaoException e1) {
-				throw new OrderServiceException(new MessageImpl(MessageImpl.TYPE_ERROR,"internal.error"));
+				throw new OrderServiceException(new MessageImpl("foo",MessageImpl.TYPE_ERROR,"internal.error", null, null));
 			}
 
 			try {
@@ -97,7 +99,7 @@ public class OrderServiceImpl implements OrderService {
 			try {
 				orderDao.saveOrUpdateOrder(order);
 			} catch (OrderDaoException e1) {
-				throw new OrderServiceException(new MessageImpl(MessageImpl.TYPE_ERROR,"internal.error"));
+				throw new OrderServiceException(new MessageImpl("foo",MessageImpl.TYPE_ERROR,"internal.error",null, null));
 			}
 			
 			try {
@@ -134,7 +136,7 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public Order cancelOrder(String orderId) throws OrderServiceException {
 		try {
-			SimpleOrder order = orderDao.findById(orderId);
+			Order order = orderDao.findById(orderId);
 			order.setStatus(Order.STATUS_CANCELED);
 			orderDao.saveOrUpdateOrder(order);
 			paymentService.doCancel(order);
@@ -164,12 +166,6 @@ public class OrderServiceImpl implements OrderService {
 	}
 	
 	@Override
-	public Order findOrderById(String shopCode, String orderId) throws OrderServiceException {
-		log.warn("unsupported parameter shopCode");
-		return findOrderById(orderId);
-	}
-	
-	@Override
 	public OrderList findOrderByCustomerIdAndShopCode(String customerId, String shopCode) throws OrderServiceException {
 		try {
 			return orderDao.findByCustomerId(customerId, shopCode, null, null, null);
@@ -180,12 +176,8 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public OrderList findOrderByCustomerIdAndShopCode(String customerId, String shopCode, String sort, Integer limit, Integer offset) throws OrderServiceException {
-		try {
-			// TODO: implement order by ---
-			return orderDao.findByCustomerId(customerId, shopCode, null, limit, offset);
-		} catch (OrderDaoException e) {
-			throw new OrderServiceException();
-		}
+		throw new RuntimeException("not implemented");
+
 	}
 
 	@SuppressWarnings({ "unchecked", "deprecation" })
@@ -298,11 +290,41 @@ public class OrderServiceImpl implements OrderService {
 		this.inventoryService = inventoryService;
 	}
 
+<<<<<<< HEAD
 
 	@Override
 	public Order cancelOrder(String shopCode, String orderId) throws OrderServiceException {
 		log.warn("unsupported parameter shopCode");
 		return cancelOrder(orderId);	
+=======
+	@Override
+	public Order cancelOrder(String shopCode, String orderId) throws OrderServiceException {
+		log.warn("unsupported parameter shopCode");
+		return cancelOrder(orderId);	
+	}
+
+	@Override
+	public Order findOrderById(String shopCode, String orderId) throws OrderServiceException {
+		log.warn("unsupported parameter shopCode");
+		return findOrderById(orderId);
+	}
+	
+	@Override
+	public OrderList findOrderByStatusAndShopCode(String status, String shopCode, String sort, Integer limit, Integer offset) throws OrderServiceException {
+		throw new RuntimeException("not implemented");
+	}
+
+	@Override
+	public void saveOrUpdate(Order order) throws OrderServiceException {
+		throw new RuntimeException("not implemented");
+		
+	}
+
+	@Override
+	public OrderList findOrdersByFilters(String shopCode, Map<String, Object> filters) throws OrderServiceException {
+		// TODO Auto-generated method stub
+		return null;
+>>>>>>> refs/remotes/origin/threepointo
 	}
 
 }
