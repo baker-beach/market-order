@@ -290,13 +290,6 @@ public class OrderServiceImpl implements OrderService {
 		this.inventoryService = inventoryService;
 	}
 
-<<<<<<< HEAD
-
-	@Override
-	public Order cancelOrder(String shopCode, String orderId) throws OrderServiceException {
-		log.warn("unsupported parameter shopCode");
-		return cancelOrder(orderId);	
-=======
 	@Override
 	public Order cancelOrder(String shopCode, String orderId) throws OrderServiceException {
 		log.warn("unsupported parameter shopCode");
@@ -324,7 +317,6 @@ public class OrderServiceImpl implements OrderService {
 	public OrderList findOrdersByFilters(String shopCode, Map<String, Object> filters) throws OrderServiceException {
 		// TODO Auto-generated method stub
 		return null;
->>>>>>> refs/remotes/origin/threepointo
 	}
 
 }
