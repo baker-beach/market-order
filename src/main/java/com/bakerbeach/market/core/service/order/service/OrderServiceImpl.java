@@ -1,5 +1,7 @@
 package com.bakerbeach.market.core.service.order.service;
 
+import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,22 +13,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import com.bakerbeach.market.cart.api.service.CartRuleAware;
 import com.bakerbeach.market.cart.api.service.CartService;
 import com.bakerbeach.market.cart.api.service.CartServiceException;
+import com.bakerbeach.market.commons.Message;
 import com.bakerbeach.market.commons.MessageImpl;
 import com.bakerbeach.market.core.api.model.Cart;
 import com.bakerbeach.market.core.api.model.CartItem;
-import com.bakerbeach.market.core.api.model.CartItem.CartItemComponent;
-import com.bakerbeach.market.core.api.model.CartItem.CartItemOption;
-import com.bakerbeach.market.core.api.model.Coupon;
 import com.bakerbeach.market.core.api.model.Customer;
 import com.bakerbeach.market.core.api.model.ShopContext;
 import com.bakerbeach.market.core.service.order.dao.OrderDao;
 import com.bakerbeach.market.core.service.order.dao.OrderDaoException;
-import com.bakerbeach.market.core.service.order.model.SimpleOrder;
-import com.bakerbeach.market.core.service.order.model.SimpleOrderItem;
-import com.bakerbeach.market.core.service.order.model.SimpleOrderItem.SimpleOrderItemComponent;
-import com.bakerbeach.market.core.service.order.model.SimpleOrderItem.SimpleOrderItemOption;
 import com.bakerbeach.market.inventory.api.model.TransactionData;
 import com.bakerbeach.market.inventory.api.service.InventoryService;
 import com.bakerbeach.market.inventory.api.service.InventoryServiceException;
@@ -42,34 +39,37 @@ import com.bakerbeach.market.sequence.service.SequenceServiceException;
 
 public class OrderServiceImpl implements OrderService {
 	protected static final Logger log = LoggerFactory.getLogger(OrderServiceImpl.class.getSimpleName());
-	
-	@Autowired(required=false)
-	private CartService cartService;
-	
+
+	@Autowired(required = false)
+	protected CartService cartService;
+
 	private SequenceService sequenceService;
 
 	private PaymentService paymentService;
 
 	private InventoryService inventoryService;
 
-	private OrderDao orderDao;
+	protected Map<String, OrderDao> orderDaos;
 
 	private static final String ORDER_ID_SEQUENCE_POSTFIX = "_order_id";
 
-	@Autowired
+	@Autowired(required = false)
 	@Qualifier("producerTemplate")
-	private ProducerTemplate producerTemplate;
+	protected ProducerTemplate producerTemplate;
 
 	@Override
 	public Order order(Cart cart, Customer customer, ShopContext shopContext) throws OrderServiceException {
 		TransactionData transactionData = null;
 
+		String shopCode = shopContext.getShopCode();
+
+		Order order = null;
 		try {
-			Order order = buildOrder(cart, customer, shopContext);
+			order = newOrder(cart, customer, shopContext);
 			try {
-				orderDao.saveOrUpdateOrder(order);
+				orderDaos.get(shopCode).saveOrUpdateOrder(order);
 			} catch (OrderDaoException e1) {
-				throw new OrderServiceException(new MessageImpl("foo",MessageImpl.TYPE_ERROR,"internal.error", null, null));
+				throw new OrderServiceException(new MessageImpl("order", MessageImpl.TYPE_ERROR, "internal.error", Arrays.asList(Message.TAG_BOX), Arrays.asList()));
 			}
 
 			try {
@@ -78,38 +78,40 @@ public class OrderServiceImpl implements OrderService {
 				throw new OrderServiceException(ise.getMessages());
 			}
 
-			if (!cart.getCoupons().isEmpty()) {
-				try {
-					Coupon coupon = cart.getCoupons().get(0);
-					cartService.setIndividualUse(coupon, customer.getId(), order.getId(), cart, shopContext.getShopCode());
-					coupon.getCode();
-				} catch (CartServiceException cse) {
-					cart.getCoupons().clear();
-					
-					throw new OrderServiceException(cse.getMessages());					
-				}
-			}
-			
 			try {
-				paymentService.doOrder(order);
+				if (cart instanceof CartRuleAware) {
+					cartService.setRuleUse(null, cart, customer, order.getId());
+				}
+			} catch (CartServiceException cse) {
+				cartService.clearCodeRules(cart);
+				throw new OrderServiceException(new MessageImpl("order", Message.TYPE_ERROR, "set-rule-use-failed", Arrays.asList(Message.TAG_BOX), Arrays.asList()));
+			}
+
+			try {
+
+				if (order.getTotal(true).getGross().compareTo(BigDecimal.ZERO) == 1)
+					paymentService.doOrder(order);
+
+				// TODO: get order status from payment serviec
+				order.setStatus(Order.STATUS_SUBMIT);
 			} catch (PaymentServiceException pse) {
 				throw new OrderServiceException(pse.getMessages());
 			}
-			
+
 			try {
-				orderDao.saveOrUpdateOrder(order);
+				orderDaos.get(shopCode).saveOrUpdateOrder(order);
 			} catch (OrderDaoException e1) {
-				throw new OrderServiceException(new MessageImpl("foo",MessageImpl.TYPE_ERROR,"internal.error",null, null));
+				throw new OrderServiceException(new MessageImpl("order", MessageImpl.TYPE_ERROR, "internal.error", Arrays.asList(Message.TAG_BOX), Arrays.asList()));
 			}
-			
+
 			try {
 				inventoryService.confirm(transactionData, order);
 			} catch (InventoryServiceException ise) {
 				log.error(ExceptionUtils.getStackTrace(ise));
 			}
-			
+
 			sendOrderMessage(order);
-			
+
 			return order;
 		} catch (OrderServiceException e) {
 			try {
@@ -117,6 +119,13 @@ public class OrderServiceImpl implements OrderService {
 			} catch (InventoryServiceException ise) {
 				log.error(ExceptionUtils.getStackTrace(ise));
 			}
+
+			try {
+				cartService.unsetRuleUse(null, cart, customer, order.getId());
+			} catch (Exception ee) {
+				log.error(ExceptionUtils.getStackTrace(ee));
+			}
+
 			throw e;
 		}
 	}
@@ -126,19 +135,24 @@ public class OrderServiceImpl implements OrderService {
 			Map<String, Object> payload = new HashMap<String, Object>();
 			payload.put("order_id", order.getId());
 			payload.put("shop_code", order.getShopCode());
-			
+
 			producerTemplate.sendBody("direct:order", payload);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			log.error(ExceptionUtils.getStackTrace(e));
 		}
 	}
 
 	@Override
 	public Order cancelOrder(String orderId) throws OrderServiceException {
+		throw new RuntimeException("not implemented");
+	}
+
+	@Override
+	public Order cancelOrder(String shopCode, String orderId) throws OrderServiceException {
 		try {
-			Order order = orderDao.findById(orderId);
+			Order order = orderDaos.get(shopCode).findById(orderId);
 			order.setStatus(Order.STATUS_CANCELED);
-			orderDao.saveOrUpdateOrder(order);
+			orderDaos.get(shopCode).saveOrUpdateOrder(order);
 			paymentService.doCancel(order);
 			return order;
 		} catch (OrderDaoException | PaymentServiceException e) {
@@ -150,98 +164,106 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public String getNextOrderId(ShopContext shopContext) throws OrderServiceException {
 		try {
-			return sequenceService.generateId(shopContext.getShopCode() + ORDER_ID_SEQUENCE_POSTFIX).toString();
+			String key = shopContext.getOrderSequenceCode() + ORDER_ID_SEQUENCE_POSTFIX;
+			Long maxRandomOffset = shopContext.getOrderSequenceRandomOffset();
+
+			return sequenceService.generateId(key, maxRandomOffset).toString();
 		} catch (SequenceServiceException e) {
 			throw new OrderServiceException();
 		}
 	}
 
 	@Override
-	public Order findOrderById(String orderId) throws OrderServiceException {
+	public Order findOrderById(String shopCode, String orderId) throws OrderServiceException {
 		try {
-			return orderDao.findById(orderId);
+			return orderDaos.get(shopCode).findById(orderId);
 		} catch (OrderDaoException e) {
 			throw new OrderServiceException();
 		}
 	}
-	
+
 	@Override
 	public OrderList findOrderByCustomerIdAndShopCode(String customerId, String shopCode) throws OrderServiceException {
-		try {
-			return orderDao.findByCustomerId(customerId, shopCode, null, null, null);
-		} catch (OrderDaoException e) {
-			throw new OrderServiceException();
-		}
+		return findOrderByCustomerIdAndShopCode(customerId, shopCode, "-id", null, null);
 	}
 
 	@Override
 	public OrderList findOrderByCustomerIdAndShopCode(String customerId, String shopCode, String sort, Integer limit, Integer offset) throws OrderServiceException {
-		throw new RuntimeException("not implemented");
+		try {
+			return orderDaos.get(shopCode).findByCustomerIdAndShop(customerId, shopCode, "-id", limit, offset);
+		} catch (OrderDaoException e) {
+			throw new OrderServiceException();
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private Order newOrder(Cart cart, Customer customer, ShopContext shopContext) throws OrderServiceException {
+		try {
+			Order order = orderDaos.get(shopContext.getShopCode()).newInstance();
+
+			order.setCustomerId(customer.getId());
+			order.setCustomerEmail(customer.getEmail());
+			order.setId(shopContext.getOrderId());
+			order.setShopCode(shopContext.getShopCode());
+			order.setCurrencyCode(shopContext.getCurrentCurrency().getIsoCode());
+			order.setTotal(order.newTotal(cart.getTotal()));
+			order.setBillingAddress(order.newAddress(shopContext.getBillingAddress()));
+			order.setShippingAddress(order.newAddress(shopContext.getShippingAddress()));
+			order.setStatus(Order.STATUS_TMP);
+			order.addAttributes((HashMap<String, Object>) shopContext.getSessionData().get(ADDITIONAL_ORDER_INFORMATIONS));
+			order.setCreatedAt(new Date());
+			cart.getItems().forEach((k, ci) -> {
+				try {
+					order.addItem(newOrderItem(ci, order));
+				} catch (OrderServiceException e) {
+					log.error(ExceptionUtils.getStackTrace(e));
+				}
+			});
+
+			return order;
+		} catch (InstantiationException | IllegalAccessException e) {
+			throw new OrderServiceException();
+		}
 
 	}
 
-	@SuppressWarnings({ "unchecked", "deprecation" })
-	private Order buildOrder(Cart cart, Customer customer, ShopContext shopContext) {
+	private OrderItem newOrderItem(CartItem ci, Order order) throws OrderServiceException {
+		OrderItem oi = order.newItem();
 
-		SimpleOrder order = new SimpleOrder();
-		order.setCustomerId(customer.getId());
-		order.setCustomerEmail(customer.getEmail());
-		order.setId(shopContext.getOrderId());
-		order.setShopCode(shopContext.getShopCode());
-		order.setCurrency(shopContext.getCurrency());
-		order.setTotal(cart.getTotal().getGross());
-		order.setBillingAddress(shopContext.getBillingAddress());
-		order.setShippingAddress(shopContext.getShippingAddress());
-		order.setStatus(Order.STATUS_SUBMIT);
-		order.setAdditionalInformations((HashMap<String, Object>) shopContext.getSessionData().get(ADDITIONAL_ORDER_INFORMATIONS));
-		order.setCreatedAt(new Date());
-		for (CartItem ci : cart.getCartItems()) {
-			order.getItems().add(buildOrderItem(ci));
-		}
-		return order;
+		oi.setCode(ci.getCode());
+		oi.setGtin(ci.getGtin());
+		oi.setBrand(ci.getBrand());
+		oi.setSupplier(ci.getSupplier());
+		oi.setQuantity(ci.getQuantity());
+		oi.setDiscount(ci.getDiscount());
+		oi.setIsVolatile(ci.isVolatile());
+		oi.setUnitPrices(ci.getUnitPrices());
+		oi.setTotalPrices(ci.getTotalPrices());
+		oi.setTaxCode(ci.getTaxCode());
+		oi.setTaxPercent(ci.getTaxPercent());
+		oi.setQualifier(ci.getQualifier());
+		oi.setTitle(ci.getTitle());
+		oi.setImages(ci.getImages());
+		oi.setType(ci.getType());
+
+		ci.getOptions().forEach((key, cio) -> {
+			OrderItem.Option option = newOption(cio, oi);
+			oi.putOption(option.getCode(), option);
+		});
+
+		return oi;
 	}
 
-	private OrderItem buildOrderItem(CartItem cartItem) {
-		SimpleOrderItem orderItem = new SimpleOrderItem();
+	private OrderItem.Option newOption(CartItem.Option cio, OrderItem oi) {
+		OrderItem.Option option = oi.newOption(cio.getCode());
 
-		orderItem.setGtin(cartItem.getGtin());
-		orderItem.setBrand(cartItem.getBrand());
-		orderItem.setSupplier(cartItem.getSupplier());
-		orderItem.setQuantity(cartItem.getQuantity());
-		orderItem.setDiscount(cartItem.getDiscount());
-		orderItem.setVolatile(cartItem.isVolatile());
-		orderItem.setUnitPrice(cartItem.getUnitPrice());
-		orderItem.setTotalPrice(cartItem.getTotalPrice());
-		orderItem.setTaxCode(cartItem.getTaxCode());
-		orderItem.setTaxPercent(cartItem.getTaxPercent());
-		orderItem.setQualifier(cartItem.getQualifier());
-		orderItem.setTitle1(cartItem.getTitle1());
-		orderItem.setTitle2(cartItem.getTitle2());
-		orderItem.setTitle2(cartItem.getTitle3());
-		orderItem.setImageUrl1(cartItem.getImageUrl1());
-		orderItem.setImageUrl2(cartItem.getImageUrl2());
-		orderItem.setSize(cartItem.getSize());
-		orderItem.setColor(cartItem.getColor());
-		
-		orderItem.getAttributes().putAll(cartItem.getAttributes());
+		option.setGtin(cio.getGtin());
+		option.setQuantity(cio.getQuantity());
+		option.setTag(cio.getTag());
+		option.setUnitPrices(cio.getUnitPrices());
+		option.setTitle(cio.getTitle());
 
-		for (String componentKey : cartItem.getComponents().keySet()) {
-			CartItemComponent cic = cartItem.getComponents().get(componentKey);
-			SimpleOrderItemComponent soic = new SimpleOrderItemComponent(cic.getName());
-			for (String optionKey : cic.getOptions().keySet()) {
-				CartItemOption cio = cic.getOptions().get(optionKey);
-				SimpleOrderItemOption soio = new SimpleOrderItemOption(cio.getGtin());
-				soio.setQuantity(cio.getQuantity());
-				soio.setTitle1(cio.getTitle1());
-				soio.setTitle2(cio.getTitle2());
-				soio.setTitle3(cio.getTitle3());
-				soio.setTotalPrice(cio.getTotalPrice());
-				soio.setUnitPrice(cio.getUnitPrice());
-				soic.getOptions().put(optionKey, soio);
-			}
-			orderItem.getComponents().put(componentKey, soic);
-		}
-		return orderItem;
+		return option;
 	}
 
 	public SequenceService getSequenceService() {
@@ -260,63 +282,49 @@ public class OrderServiceImpl implements OrderService {
 		this.paymentService = paymentService;
 	}
 
-	/**
-	 * @return the orderDao
-	 */
-	public OrderDao getOrderDao() {
-		return orderDao;
+	public void setOrderDaos(Map<String, OrderDao> orderDaos) {
+		this.orderDaos = orderDaos;
 	}
 
-	/**
-	 * @param orderDao
-	 *            the orderDao to set
-	 */
-	public void setOrderDao(OrderDao orderDao) {
-		this.orderDao = orderDao;
-	}
-
-	/**
-	 * @return the inventoryService
-	 */
 	public InventoryService getInventoryService() {
 		return inventoryService;
 	}
 
-	/**
-	 * @param inventoryService
-	 *            the inventoryService to set
-	 */
 	public void setInventoryService(InventoryService inventoryService) {
 		this.inventoryService = inventoryService;
 	}
 
 	@Override
-	public Order cancelOrder(String shopCode, String orderId) throws OrderServiceException {
-		log.warn("unsupported parameter shopCode");
-		return cancelOrder(orderId);	
-	}
-
-	@Override
-	public Order findOrderById(String shopCode, String orderId) throws OrderServiceException {
-		log.warn("unsupported parameter shopCode");
-		return findOrderById(orderId);
-	}
-	
-	@Override
-	public OrderList findOrderByStatusAndShopCode(String status, String shopCode, String sort, Integer limit, Integer offset) throws OrderServiceException {
-		throw new RuntimeException("not implemented");
-	}
-
-	@Override
-	public void saveOrUpdate(Order order) throws OrderServiceException {
-		throw new RuntimeException("not implemented");
-		
-	}
-
-	@Override
-	public OrderList findOrdersByFilters(String shopCode, Map<String, Object> filters) throws OrderServiceException {
+	public Order findOrderById(String orderId) throws OrderServiceException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
+	public OrderList findOrdersByFilters(String shopCode, Map<String, Object> filters) throws OrderServiceException {
+		try {
+			return orderDaos.get(shopCode).findByFilters(filters, null, null, null);
+		} catch (OrderDaoException e) {
+			throw new OrderServiceException();
+		}
+	}
+
+	@Override
+	public OrderList findOrderByStatusAndShopCode(String status, String shopCode, String sort, Integer limit, Integer offset) throws OrderServiceException {
+		// TODO Auto-generated method stub
+		try {
+			return orderDaos.get(shopCode).findByStatusAndShop(status, shopCode, sort, limit, offset);
+		} catch (OrderDaoException e) {
+			throw new OrderServiceException();
+		}
+	}
+
+	@Override
+	public void saveOrUpdate(Order order) throws OrderServiceException {
+		try {
+			orderDaos.get(order.getShopCode()).saveOrUpdateOrder(order);
+		} catch (OrderDaoException e) {
+			throw new OrderServiceException();
+		}
+	}
 }
