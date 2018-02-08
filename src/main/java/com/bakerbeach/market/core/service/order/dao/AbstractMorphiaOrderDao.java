@@ -81,6 +81,7 @@ public abstract class AbstractMorphiaOrderDao<O extends Order> implements OrderD
 			Integer offset) throws OrderDaoException {
 
 		Query<O> query = ((AdvancedDatastore) datastore).createQuery(orderCollectionName, orderClass);
+		query.disableValidation();
 		for(String filterKey : filters.keySet()) {
 			query.filter(filterKey, filters.get(filterKey));
 		}
