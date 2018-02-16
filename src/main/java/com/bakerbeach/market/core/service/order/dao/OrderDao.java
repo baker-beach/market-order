@@ -12,10 +12,6 @@ public interface OrderDao {
 
 	Order findById(String id) throws OrderDaoException;
 
-	@Deprecated
-	OrderList findByCustomerId(String customerId, String shopCode, DBObject orderBy, Integer limit, Integer offset)
-			throws OrderDaoException;
-
 	OrderList findByCustomerIdAndShop(String customerId, String shopCode, String orderBy, Integer limit, Integer offset)
 			throws OrderDaoException;
 
@@ -23,6 +19,6 @@ public interface OrderDao {
 
 	OrderList findByStatusAndShop(String status, String shopCode, String orderBy, Integer limit, Integer offset) throws OrderDaoException;
 	
-	OrderList findByFilters(Map<String,Object> filters, String orderBy, Integer limit, Integer offset) throws OrderDaoException;
+	OrderList findByFilters(Map<String,Object> filters, String orderBy, Integer limit, Integer offset, Boolean validate) throws OrderDaoException;
 
 }

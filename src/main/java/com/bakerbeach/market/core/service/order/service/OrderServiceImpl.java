@@ -83,7 +83,7 @@ public class OrderServiceImpl implements OrderService {
 					cartService.setRuleUse(null, cart, customer, order.getId());
 				}
 			} catch (CartServiceException cse) {
-				cartService.clearCodeRules(cart);
+				cartService.clearCodeRules(shopContext.getShopCode(), cart);
 				throw new OrderServiceException(new MessageImpl("order", Message.TYPE_ERROR, "set-rule-use-failed", Arrays.asList(Message.TAG_BOX), Arrays.asList()));
 			}
 
@@ -92,8 +92,8 @@ public class OrderServiceImpl implements OrderService {
 				if (order.getTotal(true).getGross().compareTo(BigDecimal.ZERO) == 1)
 					paymentService.doOrder(order);
 
-				// TODO: get order status from payment serviec
-				order.setStatus(Order.STATUS_SUBMIT);
+				// TODO: get order status from payment service
+				order.setStatus(Order.STATUS_SUBMITTED);
 			} catch (PaymentServiceException pse) {
 				throw new OrderServiceException(pse.getMessages());
 			}
@@ -303,7 +303,7 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public OrderList findOrdersByFilters(String shopCode, Map<String, Object> filters) throws OrderServiceException {
 		try {
-			return orderDaos.get(shopCode).findByFilters(filters, null, null, null);
+			return orderDaos.get(shopCode).findByFilters(filters, null, null, null, true);
 		} catch (OrderDaoException e) {
 			throw new OrderServiceException();
 		}

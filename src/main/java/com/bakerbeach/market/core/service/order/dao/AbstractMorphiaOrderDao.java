@@ -78,19 +78,18 @@ public abstract class AbstractMorphiaOrderDao<O extends Order> implements OrderD
 	
 	@Override
 	public OrderList findByFilters(Map<String,Object> filters, String orderBy, Integer limit,
-			Integer offset) throws OrderDaoException {
+			Integer offset,Boolean validate) throws OrderDaoException {
 
 		Query<O> query = ((AdvancedDatastore) datastore).createQuery(orderCollectionName, orderClass);
-		query.disableValidation();
+		if(validate != null && !validate)
+			query.disableValidation();
 		for(String filterKey : filters.keySet()) {
 			query.filter(filterKey, filters.get(filterKey));
 		}
 
-		if (orderBy != null) {
+		if (orderBy != null)
 			query.order(orderBy);
-		} else {
-			query.order("-_id");
-		}
+
 
 		if (limit != null)
 			query.limit(limit);
@@ -136,30 +135,6 @@ public abstract class AbstractMorphiaOrderDao<O extends Order> implements OrderD
 		return orderList;
 	}
 	
-	@Deprecated
-	@Override
-	public OrderList findByCustomerId(String customerId, String shopCode, DBObject orderBy, Integer limit,
-			Integer offset) throws OrderDaoException {
-		
-		if (orderBy != null) {
-			StringBuilder sort = new StringBuilder();
-			for (String key : orderBy.keySet()) {
-				if (sort.length() > 0) {
-					sort.append(",");
-				}
-				
-				Object value = orderBy.get(key);
-				if (value.equals("1")) {
-					sort.append("-");
-				}
-				sort.append(key);				
-			}
-			return findByCustomerIdAndShop(customerId, shopCode, sort.toString(), limit, offset);
-		} else {
-			return findByCustomerIdAndShop(customerId, shopCode, null, limit, offset);			
-		}
-	}
-
 	@Override
 	public Order newInstance() throws InstantiationException, IllegalAccessException {
 		return orderClass.newInstance();
